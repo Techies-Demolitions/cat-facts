@@ -27,3 +27,31 @@ a,
     place-items: center;
   }
 }
+
+.background-color {
+  background-color: var(--color-background);
+}
+
+.background-color-soft {
+  background-color: var(--color-background-soft);
+}
+
+.background-color-mute {
+  background-color: var(--color-background-mute);
+}
+
+.border-color {
+  border-color: var(--color-border);
+}
+
+.border-color-hover {
+  border-color: var(--color-border-hover);
+}
+
+.text-heading-color {
+  color: var(--color-heading);
+}
+
+.text-color {
+  color: var(--color-text);
+}

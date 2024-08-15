@@ -33,7 +33,7 @@
   --color-heading: var(--vt-c-text-dark-1);
   --color-text: var(--vt-c-text-dark-2);
 
-  --section-gap: 160px;
+  --section-gap: 1vw;
 }
 
 @media (prefers-color-scheme: dark) {

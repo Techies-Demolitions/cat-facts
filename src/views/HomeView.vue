@@ -16,7 +16,7 @@
         </div>
 
         <div id="footer">
-          <button @click="showAddModal()">Push</button>
+          <button @click="showAddModal()" style="margin-right:var(--section-gap)">Generate</button>
           <button @click="handlePop()">Pop</button>
           <addModal :showModal="is_Show" @itemAdded="handleItemAdded" @closeModal="handleFetchSuccess()" />
         </div>
@@ -85,22 +85,24 @@ function handlePop() {
 <style scoped>
 #container {
   height: 20vw;
-  width: 30vw;
-  padding: 1vw;
-  border: 1px solid white;
+  width: 40vw;
+  padding: var(--section-gap);
+  border: 1px solid var(--color-border);
   height: fit-content;
 }
 
+#container h2 {
+  color: var(--color-heading);
+}
+
 #header {
-  border-bottom: 1px solid white;
   width: 70%;
 }
 
 #content {
   width: 100%;
-  border: 1px solid white;
   margin-top: 1vw;
   height: fit-content;
-  padding: 1vw;
+  padding: var(--section-gap);
 }
 </style>
