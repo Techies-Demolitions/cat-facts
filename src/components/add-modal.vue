@@ -15,44 +15,55 @@
 </template>
 
 <script setup lang="ts">
-import type { Item } from '@/types/Item';
+import { getCatFacts } from '@/composable/use-item';
 import { computed, ref, watch, onMounted } from 'vue';
 
 onMounted(async () => {
-    window.addEventListener('click', handleClickOutside),
-        await fetchCatData()
-            .then(() => {
-                console.log("Process Finished")
-            })
-            .catch((error) => {
-                console.log("Error Found: " + error)
-            })
+    window.addEventListener('click', handleClickOutside)
 });
-
-const catUrl = 'https://cat-fact.herokuapp.com/facts/591f98803b90f7150a19c229'
-const cats = ref()
-
-async function fetchCatData() {
-    console.log("Fetching Data...")
-    const response = await fetch(catUrl)
-    console.log("Fetched data")
-    const data = await response.json()
-    cats.value = data.updatedAt
-    console.log("Cats Info: " + JSON.stringify(cats.value))
-}
-
-const item = ref<Item>({
-    id: 0,
-    name: ""
-})
-
-const props = defineProps({
-    showModal: Boolean
-});
-
-const emit = defineEmits(["closeModal", "itemAdded"]);
 
 const isActive = ref<boolean>(false);
+const catFactsText = ref<string>('');
+const triggerGenerateNewFacts = ref<boolean>()
+
+async function fetchCatData() {
+    const fetchedCatFactsData = await getCatFacts()
+    insertFollowingData(fetchedCatFactsData.value.facts)
+    handleIsFactForCats(catFactsText.value)
+}
+
+async function refetchCatData() {
+    fetchCatData();
+}
+
+function insertFollowingData(insertedText: string) {
+    catFactsText.value = insertedText;
+}
+
+function handleIsFactForCats(inputText: string) {
+    if (isFactForCats(inputText)) {
+        catFactsText.value = inputText;
+    } else {
+        catFactsText.value = "Generating"
+        refetchCatData();
+    }
+}
+
+function isFactForCats(input: string): boolean {
+    // checks if facts fetched are for cats
+    if (input.search(/cat/i) > 0) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+const props = defineProps({
+    showModal: Boolean,
+    generateNewFact: Boolean
+});
+
+const emit = defineEmits(["closeModal", "itemAdded", "factsForCats"]);
 
 const modal = ref<HTMLElement | null>(null);
 
@@ -60,6 +71,17 @@ watch(
     () => props.showModal,
     (newValue) => {
         isActive.value = newValue;
+    },
+    { immediate: true }
+);
+
+watch(
+    () => props.generateNewFact,
+    (newValue) => {
+        triggerGenerateNewFacts.value = newValue;
+        if (triggerGenerateNewFacts.value) {
+            handleGenerateNewFacts();
+        }
     },
     { immediate: true }
 );
@@ -76,12 +98,12 @@ function handleClickOutside(event: MouseEvent) {
 
 function handleKeep() {
     // checks if input is empty
-    emit("itemAdded", item.value.name)
+    emit("itemAdded", catFactsText.value)
     emit("closeModal")
 }
 
 async function handleGenerateNewFacts() {
-
+    fetchCatData();
 }
 
 function closeModal() {
@@ -89,7 +111,7 @@ function closeModal() {
 }
 
 function showFacts() {
-    return "Yehey"
+    return catFactsText.value;
 }
 </script>
 

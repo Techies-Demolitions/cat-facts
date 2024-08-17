@@ -9,7 +9,7 @@
                 </tr>
                 <tr v-for="items in displayItems " :key="items.id">
                     <td class="idItems">{{ items.id }}</td>
-                    <td>{{ items.name }}</td>
+                    <td>{{ items.facts }}</td>
                 </tr>
             </table>
         </div>
@@ -17,8 +17,8 @@
 </template>
 
 <script setup lang="ts">
-import { useItem } from '@/composables/use-item';
-import type { Item } from '@/types/Item';
+import { useItem } from '@/composable/use-item';
+import type { Facts } from '@/types/facts';
 import { onMounted, ref } from 'vue';
 
 const { getItem } = useItem()
@@ -29,10 +29,10 @@ onMounted(async () => {
 
 async function fetchItems() {
     const fetchedItems = await getItem()
-    displayItems.value = fetchedItems as Item[]
+    displayItems.value = fetchedItems as Facts[]
 }
 
-const displayItems = ref<Item[]>([])
+const displayItems = ref<Facts[]>([])
 
 const showText = ref<string>("Show All")
 const toggle = ref<boolean>(true)
