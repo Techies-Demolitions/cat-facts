@@ -26,6 +26,9 @@ a,
     display: flex;
     place-items: center;
   }
+  #app {
+    width: var(--width);
+  }
 }
 
 .background-color {

@@ -5,7 +5,7 @@
         <div id="header">
           <center>
             <h2>
-              Cat Facts System
+              Cat Facts Generator
             </h2>
             <img src="/src/assets/cat-paw.png" class="img-class">
           </center>
@@ -98,7 +98,8 @@ function handlePop() {
 <style scoped>
 #container {
   height: 20vw;
-  width: 55vw;
+  width: auto;
+  min-width: var(--section-gap);
   padding: var(--section-gap);
   border: 1px solid var(--color-border);
   height: fit-content;

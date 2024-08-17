@@ -45,5 +45,6 @@ export async function getCatFacts() {
   const response = await catFactsFactory(facts).catch((error) => {
     throw new Error(error)
   })
+
   return response
 }

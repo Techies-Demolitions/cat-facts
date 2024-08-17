@@ -41,7 +41,7 @@ export const useItemStore = defineStore('items', () => {
     if (locale === -1) {
       items.value[locale] = updatedItem
     } else {
-      console.error('Item not found')
+      throw new Error('Item not found')
     }
   }
 

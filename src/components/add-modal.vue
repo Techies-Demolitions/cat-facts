@@ -19,44 +19,8 @@ import { getCatFacts } from '@/composable/use-item';
 import { computed, ref, watch, onMounted } from 'vue';
 
 onMounted(async () => {
-    window.addEventListener('click', handleClickOutside)
+    window.addEventListener('click', handleClickOutside);
 });
-
-const isActive = ref<boolean>(false);
-const catFactsText = ref<string>('');
-const triggerGenerateNewFacts = ref<boolean>()
-
-async function fetchCatData() {
-    const fetchedCatFactsData = await getCatFacts()
-    insertFollowingData(fetchedCatFactsData.value.facts)
-    handleIsFactForCats(catFactsText.value)
-}
-
-async function refetchCatData() {
-    fetchCatData();
-}
-
-function insertFollowingData(insertedText: string) {
-    catFactsText.value = insertedText;
-}
-
-function handleIsFactForCats(inputText: string) {
-    if (isFactForCats(inputText)) {
-        catFactsText.value = inputText;
-    } else {
-        catFactsText.value = "Generating"
-        refetchCatData();
-    }
-}
-
-function isFactForCats(input: string): boolean {
-    // checks if facts fetched are for cats
-    if (input.search(/cat/i) > 0) {
-        return true;
-    } else {
-        return false;
-    }
-}
 
 const props = defineProps({
     showModal: Boolean,
@@ -65,7 +29,61 @@ const props = defineProps({
 
 const emit = defineEmits(["closeModal", "itemAdded", "factsForCats"]);
 
+const isActive = ref<boolean>(false);
+const catFactsText = ref<string>('');
+const triggerGenerateNewFacts = ref<boolean>();
+
+async function fetchCatData() {
+    const fetchedCatFactsData = await getCatFacts();
+    handleIsFactForCats(fetchedCatFactsData.value.facts);
+}
+
+async function refetchCatData() {
+    fetchCatData();
+}
+
+function handleIsFactForCats(inputText: string) {
+    if (isFactForCats(inputText)) {
+        catFactsText.value = inputText;
+    } else {
+        catFactsText.value = "Generating";
+        refetchCatData();
+    }
+}
+
+function isFactForCats(input: string): boolean {
+    if (input.search(/cat/i) > 0) { return true; }
+    else { return false; }
+}
+
 const modal = ref<HTMLElement | null>(null);
+
+const getStyle = computed(() => ({
+    display: isActive.value ? 'block' : 'none'
+}));
+
+function handleClickOutside(event: MouseEvent) {
+    if (modal.value && event.target === modal.value) {
+        emit("closeModal");
+    }
+}
+
+function handleKeep() {
+    emit("itemAdded", catFactsText.value);
+    emit("closeModal");
+}
+
+async function handleGenerateNewFacts() {
+    fetchCatData();
+}
+
+function closeModal() {
+    emit("closeModal");
+}
+
+function showFacts() {
+    return catFactsText.value;
+}
 
 watch(
     () => props.showModal,
@@ -86,33 +104,6 @@ watch(
     { immediate: true }
 );
 
-const getStyle = computed(() => ({
-    display: isActive.value ? 'block' : 'none'
-}));
-
-function handleClickOutside(event: MouseEvent) {
-    if (modal.value && event.target === modal.value) {
-        emit("closeModal");
-    }
-}
-
-function handleKeep() {
-    // checks if input is empty
-    emit("itemAdded", catFactsText.value)
-    emit("closeModal")
-}
-
-async function handleGenerateNewFacts() {
-    fetchCatData();
-}
-
-function closeModal() {
-    emit("closeModal")
-}
-
-function showFacts() {
-    return catFactsText.value;
-}
 </script>
 
 <style scoped>
