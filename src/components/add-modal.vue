@@ -3,61 +3,95 @@
         <!-- Modal content -->
         <div class="modal-content">
             <span class="close" @click="closeModal">&times;</span>
-            <label for="enterItem">Enter Item Name: </label>
-            <input type="text" id="enterItem" v-model="itemName" placeholder="Enter Item Name..." />
-            <button @click="handleSubmit()">Submit</button><br>
-            <span v-if="shouldShowError()" style="color:red">Must contain texts</span>
+            <p style="color: var(--color-text);">
+                {{ showFacts() }}
+            </p><br>
+            <div style="display:inline" v-if="shouldShowTools">
+                <button @click="handleKeep()" style="margin-right:var(--section-gap)">Keep</button>
+                <button @click="handleGenerateNewFacts()">Generate New Facts</button>
+            </div>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import type { Item } from '@/types/Item';
+import { getCatFacts } from '@/composable/use-item';
+import { FactsThings } from '@/enums/enums';
 import { computed, ref, watch, onMounted } from 'vue';
 
 onMounted(async () => {
-    window.addEventListener('click', handleClickOutside),
-        loadData(),
-        await fetchCatData()
-            .then(() => {
-                console.log("Process Finished")
-            })
-            .catch((error) => {
-                console.log("Error Found: " + error)
-            })
+    window.addEventListener('click', handleClickOutside);
 });
-
-const catUrl = 'https://cat-fact.herokuapp.com/facts/591f98803b90f7150a19c229'
-const cats = ref()
-
-async function fetchCatData() {
-    console.log("Fetching Data...")
-    const response = await fetch(catUrl)
-    console.log("Fetched data")
-    const data = await response.json()
-    cats.value = data.updatedAt
-    console.log("Cats Info: " + JSON.stringify(cats.value))
-}
-
-function loadData() {
-    item.value.name = ""
-}
-
-const item = ref<Item>({
-    id: 0,
-    name: ""
-})
 
 const props = defineProps({
-    showModal: Boolean
+    showModal: Boolean,
+    generateNewFact: Boolean
 });
 
-const emit = defineEmits(["closeModal", "itemAdded"]);
+const emit = defineEmits(["closeModal", "itemAdded", "factsForCats"]);
 
 const isActive = ref<boolean>(false);
-const itemName = ref<string>('')
+const catFactsText = ref<string>('');
+const catFactsDate = ref<number>();
+const triggerGenerateNewFacts = ref<boolean>();
+const shouldShowTools = ref<boolean>(true);
+
+async function fetchCatData() {
+    const fetchedCatFactsData = await getCatFacts();
+    handleIsFactForCats(fetchedCatFactsData.value.facts);
+    insertDate(fetchedCatFactsData.value.dateCreated);
+}
+
+async function refetchCatData() {
+    fetchCatData();
+}
+
+function insertDate(inputDate: number) {
+    catFactsDate.value = inputDate;
+}
+
+function handleIsFactForCats(inputText: string) {
+    if (isFactForCats(inputText)) {
+        catFactsText.value = inputText;
+    } else {
+        catFactsText.value = FactsThings.Generating;
+        refetchCatData();
+    }
+}
+
+function isFactForCats(input: string): boolean {
+    if (input.search(/cat/i) > 0) { return true; }
+    else { return false; }
+}
 
 const modal = ref<HTMLElement | null>(null);
+
+const getStyle = computed(() => ({
+    display: isActive.value ? 'block' : 'none'
+}));
+
+function handleClickOutside(event: MouseEvent) {
+    if (modal.value && event.target === modal.value) {
+        emit("closeModal");
+    }
+}
+
+function handleKeep() {
+    emit("itemAdded", catFactsText.value, catFactsDate.value);
+    emit("closeModal");
+}
+
+async function handleGenerateNewFacts() {
+    fetchCatData();
+}
+
+function closeModal() {
+    emit("closeModal");
+}
+
+function showFacts() {
+    return catFactsText.value;
+}
 
 watch(
     () => props.showModal,
@@ -67,37 +101,29 @@ watch(
     { immediate: true }
 );
 
-const getStyle = computed(() => ({
-    color: isActive.value ? 'green' : 'blue',
-    display: isActive.value ? 'block' : 'none'
-}));
+watch(
+    () => props.generateNewFact,
+    (newValue) => {
+        triggerGenerateNewFacts.value = newValue;
+        if (triggerGenerateNewFacts.value) {
+            handleGenerateNewFacts();
+        }
+    },
+    { immediate: true }
+);
 
-function loadName() {
-    item.value.name = itemName.value
-}
+watch(
+    () => catFactsText.value,
+    (itsNewValue) => {
+        if (itsNewValue === FactsThings.Generating) {
+            shouldShowTools.value = false
+        } else {
+            shouldShowTools.value = true
+        }
+    },
+    { immediate: true }
+);
 
-function handleClickOutside(event: MouseEvent) {
-    if (modal.value && event.target === modal.value) {
-        emit("closeModal");
-    }
-}
-
-function handleSubmit() {
-    loadName()
-    // checks if input is empty
-    if (!shouldShowError()) {
-        emit("itemAdded", item.value.name)
-        emit("closeModal")
-    }
-}
-
-function closeModal() {
-    emit("closeModal")
-}
-
-function shouldShowError() {
-    return item.value.name === ""
-}
 </script>
 
 <style scoped>
@@ -120,9 +146,9 @@ function shouldShowError() {
 
 /* Modal Content */
 .modal-content {
-    background-color: #fefefe;
-    padding: 20px;
-    border: 1px solid #888;
+    background-color: var(--color-background-soft);
+    padding: var(--section-gap);
+    border: 1px solid var(--color-border);
     width: 25%;
     height: fit-content;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
@@ -130,7 +156,7 @@ function shouldShowError() {
 
 /* The Close Button */
 .close {
-    color: #aaaaaa;
+    color: red;
     float: right;
     font-size: 28px;
     font-weight: bold;

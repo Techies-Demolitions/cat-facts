@@ -4,12 +4,17 @@
         <div v-if="!toggle">
             <table>
                 <tr>
-                    <th>id</th>
-                    <th>name</th>
+                    <th>Id</th>
+                    <th>
+                        Date<br>
+                        (yyyy/mm/dd)
+                    </th>
+                    <th>Facts</th>
                 </tr>
                 <tr v-for="items in displayItems " :key="items.id">
-                    <td>{{ items.id }}</td>
-                    <td>{{ items.name }}</td>
+                    <td class="modifiedItems">{{ items.id }}</td>
+                    <td class="modifiedItems">{{ items.dateCreated }}</td>
+                    <td>{{ items.facts }}</td>
                 </tr>
             </table>
         </div>
@@ -17,8 +22,8 @@
 </template>
 
 <script setup lang="ts">
-import { useItem } from '@/composables/use-item';
-import type { Item } from '@/types/Item';
+import { useItem } from '@/composable/use-item';
+import type { Facts } from '@/types/facts';
 import { onMounted, ref } from 'vue';
 
 const { getItem } = useItem()
@@ -29,10 +34,10 @@ onMounted(async () => {
 
 async function fetchItems() {
     const fetchedItems = await getItem()
-    displayItems.value = fetchedItems as Item[]
+    displayItems.value = fetchedItems as Facts[]
 }
 
-const displayItems = ref<Item[]>([])
+const displayItems = ref<Facts[]>([])
 
 const showText = ref<string>("Show All")
 const toggle = ref<boolean>(true)
@@ -49,9 +54,10 @@ function toggleShowText() {
 
 <style scoped>
 #contain {
-    border: 1px solid red;
+    border: 1px solid #512B81;
     margin-top: 1vw;
     height: fit-content;
+    padding: var(--section-gap);
 }
 
 #showAllButton {
@@ -59,19 +65,26 @@ function toggleShowText() {
 }
 
 table {
-    border: 1px solid yellow;
+    border: 1px solid #4477CE;
     width: 100%;
+    padding: var(--section-gap);
 }
 
 td {
-    border: 1px solid yellow
-}
-
-tr {
-    border: 1px solid yellow
+    border-left: 1px solid #8CABFF;
+    border-bottom: 1px solid #8CABFF;
+    border-right: 1px solid #8CABFF;
+    min-width: 150px;
+    text-align: justify;
+    padding: var(--section-gap);
 }
 
 th {
-    border: 1px solid yellow
+    border: 1px solid #8CABFF;
+    color: var(--color-heading);
+}
+
+.modifiedItems {
+    text-align: center;
 }
 </style>

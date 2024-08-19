@@ -1,10 +1,10 @@
 import { piniaInstance } from '@/global'
-import type { Item } from '@/types/Item'
+import type { Facts } from '@/types/facts'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
 export const useItemStore = defineStore('items', () => {
-  const items = ref<Item[]>([])
+  const items = ref<Facts[]>([])
 
   const getItemData: any = localStorage.getItem('itemsStored')
 
@@ -15,21 +15,21 @@ export const useItemStore = defineStore('items', () => {
   const id = ref<number>(items.value.length)
 
   // Actions
-  function addItemStore(itemName: string) {
+  function addItemStore(itemName: string, date: number) {
     const item = {
       id: id.value++,
-      name: itemName
+      facts: itemName,
+      dateCreated: date
     }
-    items.value.push(item as Item)
+    items.value.push(item as Facts)
   }
 
-  function setItemStore(setItems: Item[]) {
+  function setItemStore(setItems: Facts[]) {
     items.value = setItems
   }
 
-  function deleteItemStore(item: Item) {
+  function deleteItemStore(item: Facts) {
     items.value = items.value.filter((items) => items.id !== item.id)
-    id.value -= 1
   }
 
   function popItemStore() {
@@ -37,12 +37,12 @@ export const useItemStore = defineStore('items', () => {
     id.value -= 1
   }
 
-  function updateItemStore(updatedItem: Item) {
+  function updateItemStore(updatedItem: Facts) {
     const locale = items.value.findIndex((items) => items.id === updatedItem.id)
     if (locale === -1) {
       items.value[locale] = updatedItem
     } else {
-      console.error('Item not found')
+      throw new Error('Item not found')
     }
   }
 

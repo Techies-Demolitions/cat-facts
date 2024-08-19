@@ -22,7 +22,8 @@ watch(() => props.countAtCurrent,
 
 <style scoped>
 #contain {
-    border: 1px solid red;
+    border: 1px solid #512B81;
     width: 100%;
+    color: var(--color-heading);
 }
 </style>

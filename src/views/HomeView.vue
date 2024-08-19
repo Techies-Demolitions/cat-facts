@@ -5,8 +5,9 @@
         <div id="header">
           <center>
             <h2>
-              Stack Storage System
+              Cat Facts Generator
             </h2>
+            <img src="/src/assets/cat-paw.png" class="img-class">
           </center>
         </div>
 
@@ -16,9 +17,10 @@
         </div>
 
         <div id="footer">
-          <button @click="showAddModal()">Push</button>
+          <button @click="handleGenerate()" style="margin-right:var(--section-gap)">Generate</button>
           <button @click="handlePop()">Pop</button>
-          <addModal :showModal="is_Show" @itemAdded="handleItemAdded" @closeModal="handleFetchSuccess()" />
+          <addModal :showModal="is_Show" :generateNewFact="newFacts" @itemAdded="handleItemAdded"
+            @closeModal="handleFetchSuccess()" />
         </div>
       </center>
     </div>
@@ -29,26 +31,31 @@
 import addModal from '@/components/add-modal.vue';
 import itemCount from '@/components/item-count.vue';
 import ItemTable from '@/components/item-table.vue';
-import { storeLocalStorage, useItem } from '@/composables/use-item';
-import type { Item } from '@/types/Item';
+import { storeLocalStorage, useItem } from '@/composable/use-item';
+import type { Facts } from '@/types/facts';
 import { onMounted, ref } from 'vue';
 
 const { addItem, getItem, popItem } = useItem()
 
 onMounted(() => {
   fetchItemData(),
-    storeLocalStorage()
+    storeLocalStorage(),
+    generateNewFacts()
 })
+
+const item = ref<Facts[]>([])
+const is_Show = ref<boolean>()
+const count = ref<number>();
+const newFacts = ref<boolean>();
 
 async function fetchItemData() {
   const itemsLoaded = await getItem();
-  item.value = itemsLoaded as Item[];
+  item.value = itemsLoaded as Facts[];
 }
 
-const item = ref<Item[]>([])
-
-const is_Show = ref<boolean>()
-const count = ref<number>();
+function generateNewFacts(): void {
+  newFacts.value = true;
+}
 
 function currentCount() {
   count.value = item.value.length
@@ -58,20 +65,26 @@ function currentCount() {
   return count.value
 }
 
-function showAddModal() {
+function showAddModal(): void {
   is_Show.value = true;
 }
 
-function handleFetchSuccess() {
+function handleGenerate(): void {
+  generateNewFacts();
+  showAddModal();
+}
+
+function handleFetchSuccess(): void {
   closeModal();
 }
 
 function closeModal() {
   is_Show.value = false;
+  newFacts.value = false;
 }
 
-function handleItemAdded(itemAdd: string) {
-  addItem(itemAdd)
+function handleItemAdded(itemAdd: string, itemDate: number): void {
+  addItem(itemAdd, itemDate)
   fetchItemData()
   storeLocalStorage()
 }
@@ -85,22 +98,31 @@ function handlePop() {
 <style scoped>
 #container {
   height: 20vw;
-  width: 30vw;
-  padding: 1vw;
-  border: 1px solid white;
+  width: auto;
+  min-width: var(--section-gap);
+  padding: var(--section-gap);
+  border: 1px solid var(--color-border);
   height: fit-content;
 }
 
+#container h2 {
+  color: var(--color-heading);
+}
+
 #header {
-  border-bottom: 1px solid white;
   width: 70%;
 }
 
 #content {
   width: 100%;
-  border: 1px solid white;
   margin-top: 1vw;
   height: fit-content;
-  padding: 1vw;
+  padding: var(--section-gap);
+}
+
+.img-class {
+  width: 5vw;
+  height: 5vw;
+  margin-top: var(--section-gap);
 }
 </style>
