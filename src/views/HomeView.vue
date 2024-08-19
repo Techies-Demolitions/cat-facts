@@ -83,8 +83,8 @@ function closeModal() {
   newFacts.value = false;
 }
 
-function handleItemAdded(itemAdd: string): void {
-  addItem(itemAdd)
+function handleItemAdded(itemAdd: string, itemDate: number): void {
+  addItem(itemAdd, itemDate)
   fetchItemData()
   storeLocalStorage()
 }

@@ -5,10 +5,15 @@
             <table>
                 <tr>
                     <th>Id</th>
+                    <th>
+                        Date<br>
+                        (yyyy/mm/dd)
+                    </th>
                     <th>Facts</th>
                 </tr>
                 <tr v-for="items in displayItems " :key="items.id">
-                    <td class="idItems">{{ items.id }}</td>
+                    <td class="modifiedItems">{{ items.id }}</td>
+                    <td class="modifiedItems">{{ items.dateCreated }}</td>
                     <td>{{ items.facts }}</td>
                 </tr>
             </table>
@@ -69,7 +74,7 @@ td {
     border-left: 1px solid #8CABFF;
     border-bottom: 1px solid #8CABFF;
     border-right: 1px solid #8CABFF;
-    min-width: 100px;
+    min-width: 150px;
     text-align: justify;
     padding: var(--section-gap);
 }
@@ -79,7 +84,7 @@ th {
     color: var(--color-heading);
 }
 
-.idItems {
+.modifiedItems {
     text-align: center;
 }
 </style>

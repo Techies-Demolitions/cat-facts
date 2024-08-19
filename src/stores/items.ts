@@ -15,10 +15,11 @@ export const useItemStore = defineStore('items', () => {
   const id = ref<number>(items.value.length)
 
   // Actions
-  function addItemStore(itemName: string) {
+  function addItemStore(itemName: string, date: number) {
     const item = {
       id: id.value++,
-      facts: itemName
+      facts: itemName,
+      dateCreated: date
     }
     items.value.push(item as Facts)
   }

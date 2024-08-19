@@ -1,5 +1,5 @@
 import { getCatFactsData } from '@/api/get-facts/index.get'
-import { catFactsFactory } from '@/factories/facts.factory'
+import { catFactsFactory, modifyDateFactory } from '@/factories/facts.factory'
 import { useItemStore } from '@/stores/items'
 import type { Facts } from '@/types/facts'
 
@@ -16,8 +16,8 @@ export function useItem() {
     itemStore.setItemStore(items)
   }
 
-  async function addItem(name: string) {
-    itemStore.addItemStore(name)
+  async function addItem(name: string, date: number) {
+    itemStore.addItemStore(name, date)
   }
 
   function popItem() {
@@ -41,8 +41,9 @@ export async function storeLocalStorage() {
 
 export async function getCatFacts() {
   const facts = await getCatFactsData()
+  const modifiedDate = modifyDateFactory(facts)
 
-  const response = await catFactsFactory(facts).catch((error) => {
+  const response = await catFactsFactory(facts, modifiedDate).catch((error) => {
     throw new Error(error)
   })
 

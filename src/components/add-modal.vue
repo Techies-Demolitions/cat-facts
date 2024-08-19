@@ -6,7 +6,7 @@
             <p style="color: var(--color-text);">
                 {{ showFacts() }}
             </p><br>
-            <div style="display:inline">
+            <div style="display:inline" v-if="shouldShowTools">
                 <button @click="handleKeep()" style="margin-right:var(--section-gap)">Keep</button>
                 <button @click="handleGenerateNewFacts()">Generate New Facts</button>
             </div>
@@ -16,6 +16,7 @@
 
 <script setup lang="ts">
 import { getCatFacts } from '@/composable/use-item';
+import { FactsThings } from '@/enums/enums';
 import { computed, ref, watch, onMounted } from 'vue';
 
 onMounted(async () => {
@@ -31,22 +32,29 @@ const emit = defineEmits(["closeModal", "itemAdded", "factsForCats"]);
 
 const isActive = ref<boolean>(false);
 const catFactsText = ref<string>('');
+const catFactsDate = ref<number>();
 const triggerGenerateNewFacts = ref<boolean>();
+const shouldShowTools = ref<boolean>(true);
 
 async function fetchCatData() {
     const fetchedCatFactsData = await getCatFacts();
     handleIsFactForCats(fetchedCatFactsData.value.facts);
+    insertDate(fetchedCatFactsData.value.dateCreated);
 }
 
 async function refetchCatData() {
     fetchCatData();
 }
 
+function insertDate(inputDate: number) {
+    catFactsDate.value = inputDate;
+}
+
 function handleIsFactForCats(inputText: string) {
     if (isFactForCats(inputText)) {
         catFactsText.value = inputText;
     } else {
-        catFactsText.value = "Generating";
+        catFactsText.value = FactsThings.Generating;
         refetchCatData();
     }
 }
@@ -69,7 +77,7 @@ function handleClickOutside(event: MouseEvent) {
 }
 
 function handleKeep() {
-    emit("itemAdded", catFactsText.value);
+    emit("itemAdded", catFactsText.value, catFactsDate.value);
     emit("closeModal");
 }
 
@@ -99,6 +107,18 @@ watch(
         triggerGenerateNewFacts.value = newValue;
         if (triggerGenerateNewFacts.value) {
             handleGenerateNewFacts();
+        }
+    },
+    { immediate: true }
+);
+
+watch(
+    () => catFactsText.value,
+    (itsNewValue) => {
+        if (itsNewValue === FactsThings.Generating) {
+            shouldShowTools.value = false
+        } else {
+            shouldShowTools.value = true
         }
     },
     { immediate: true }
