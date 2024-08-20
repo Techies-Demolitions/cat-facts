@@ -10,7 +10,7 @@ STRICTLY DO NOT WRITE MAIN BRANCH OR I WILL KILL Y..
 
 Jokes aside.
 
-Rulesets:
+# Rulesets:
 
 ## Main-branch is strictly READ-ONLY
 To say this differently, branches are used to push into this branch for safety purposes. Do not push directly to it.
