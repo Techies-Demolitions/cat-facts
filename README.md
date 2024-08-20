@@ -1,6 +1,8 @@
 # cat-facts
 Store Random Cat Facts using Cat Facts API
 
+----------------------------------------------------------------------------
+
 BEFORE EVERYTHING ELSE!
 LISTEN! HEAR! SEE! WHATEVER!
 
