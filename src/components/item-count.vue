@@ -1,6 +1,6 @@
 <template>
     <div id="contain">
-        Total Items: {{ currentCount }}
+        Total Items: {{ currentItemCount }}
     </div>
 </template>
 
@@ -8,14 +8,14 @@
 import { ref, watch } from 'vue';
 
 const props = defineProps({
-    countAtCurrent: Number
+    itemCountAtCurrent: Number
 })
 
-const currentCount = ref<number | any>()
+const currentItemCount = ref<number>()
 
-watch(() => props.countAtCurrent,
+watch(() => props.itemCountAtCurrent,
     (receivedValue) => {
-        currentCount.value = receivedValue
+        currentItemCount.value = receivedValue
     })
 
 </script>

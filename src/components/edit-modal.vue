@@ -7,7 +7,7 @@
                 {{ showFacts() }}
             </p><br>
             <div style="display:inline" v-if="shouldShowTools">
-                <button @click="keepFacts()" style="margin-right:var(--section-gap)">Keep</button>
+                <button @click="changeKeptFacts()" style="margin-right:var(--section-gap)">Change</button>
                 <button @click="generateNewFacts()">Generate New Facts</button>
             </div>
         </div>
@@ -20,20 +20,23 @@ import { FactsThings } from '@/enums/enums';
 import { computed, ref, watch, onMounted } from 'vue';
 
 onMounted(async () => {
+    fetchCatData();
     window.addEventListener('click', handleClickOutside);
 });
 
 const props = defineProps({
     showModal: Boolean,
-    generateNewFact: Boolean
+    generateNewFact: Boolean,
+    passedCatFactsText: String
 });
 
-const emit = defineEmits(["closeModal", "itemAdded", "factsForCats"]);
+const emit = defineEmits(["closeModal", "itemAdded", "factsForCats", "itemUpdated"]);
 
 const isActive = ref<boolean>(false);
-const catFactsText = ref<string>('');
-const catFactsDate = ref<number>();
-const generateNewFactsIsTrigger = ref<boolean>();
+const previousFactsText = ref<string>('');
+const currentFactsText = ref<string>('');
+const currentFactsDate = ref<number>();
+const triggerGenerateNewFacts = ref<boolean>();
 const shouldShowTools = ref<boolean>(true);
 const modal = ref<HTMLElement | null>(null);
 
@@ -41,10 +44,9 @@ async function fetchCatData() {
     const fetchedCatFactsData = await getCatFacts();
 
     if (typeof (fetchedCatFactsData) === "string") { // responds bad request
-        catFactsText.value = fetchedCatFactsData
+        currentFactsText.value = fetchedCatFactsData
         return
     }
-
     handleIsFactForCats(fetchedCatFactsData.value.facts);
     insertDate(fetchedCatFactsData.value.dateCreated);
 }
@@ -53,13 +55,13 @@ async function refetchCatData() {
     fetchCatData();
 }
 
-function insertDate(fetchedDateCreated: number) {
-    catFactsDate.value = fetchedDateCreated;
+function insertDate(inputDate: number) {
+    currentFactsDate.value = inputDate;
 }
 
 function handleIsFactForCats(fetchedFact: string) {
-    catFactsText.value = isFetchedFactForCats(fetchedFact) ? fetchedFact : FactsThings.Generating;
-    if (catFactsText.value === fetchedFact) return
+    currentFactsText.value = isFetchedFactForCats(fetchedFact) ? fetchedFact : FactsThings.Generating;
+    if (currentFactsText.value === fetchedFact) return
     refetchCatData();
 }
 
@@ -74,13 +76,13 @@ const getStyle = computed(() => ({
 
 function handleClickOutside(event: MouseEvent) {
     if (modal.value && event.target === modal.value) {
-        closeModal();
+        emit("closeModal");
     }
 }
 
-function keepFacts() {
-    emit("itemAdded", catFactsText.value, catFactsDate.value);
-    closeModal();
+function changeKeptFacts() {
+    emit("itemUpdated", previousFactsText.value, currentFactsText.value, currentFactsDate.value)
+    emit("closeModal");
 }
 
 async function generateNewFacts() {
@@ -92,7 +94,7 @@ function closeModal() {
 }
 
 function showFacts() {
-    return catFactsText.value;
+    return currentFactsText.value;
 }
 
 watch(
@@ -106,8 +108,8 @@ watch(
 watch(
     () => props.generateNewFact,
     (newValue) => {
-        generateNewFactsIsTrigger.value = newValue;
-        if (generateNewFactsIsTrigger.value) {
+        triggerGenerateNewFacts.value = newValue;
+        if (triggerGenerateNewFacts.value) {
             generateNewFacts();
         }
     },
@@ -115,13 +117,22 @@ watch(
 );
 
 watch(
-    () => catFactsText.value,
+    () => currentFactsText.value,
     (itsNewValue) => {
         if (itsNewValue === FactsThings.Generating) {
             shouldShowTools.value = false
         } else {
             shouldShowTools.value = true
         }
+    },
+    { immediate: true }
+);
+
+watch(
+    () => props.passedCatFactsText,
+    (itsNewValue) => {
+        if (itsNewValue === undefined) return
+        previousFactsText.value = itsNewValue
     },
     { immediate: true }
 );
@@ -160,7 +171,8 @@ watch(
 .close {
     color: red;
     float: right;
-    font-size: 28px;
+    /* font-size: 28px;
+    font-weight: bold; */
 }
 
 .close:hover,

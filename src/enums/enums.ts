@@ -1,3 +1,4 @@
 export enum FactsThings {
-  Generating = 'Generating'
+  Generating = 'Generating',
+  ErrorMessage = 'Failed to Fetch'
 }

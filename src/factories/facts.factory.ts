@@ -11,7 +11,7 @@ export async function catFactsFactory(data: any, date: any) {
   return catFacts
 }
 
-export function modifyDateFactory(data: any) {
+export function formatDateFactory(data: any) {
   const date = ref<string>('')
   date.value = data.updatedAt.toString()
   const dateOnly = date.value.split('T')[0]

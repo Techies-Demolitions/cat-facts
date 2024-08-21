@@ -5,22 +5,28 @@
         <div id="header">
           <center>
             <h2>
-              Cat Facts Generator
+              <span class="nes-text is-primary">Cat Facts Generator</span>
             </h2>
             <img src="/src/assets/cat-paw.png" class="img-class">
           </center>
         </div>
 
         <div id="content">
-          <itemCount :countAtCurrent="currentCount()" />
-          <ItemTable />
+          <itemCount :itemCountAtCurrent="currentItemCount()" />
+          <ItemTable :isDelete="isDelete" :isEdit="isEdit" @showEditModal="handleShowEditModal"
+            @currentCatFactsText="handleCurrentCatFactsText" />
         </div>
 
         <div id="footer">
-          <button @click="handleGenerate()" style="margin-right:var(--section-gap)">Generate</button>
+          <button @click="handleGenerate()">Generate</button>
           <button @click="handlePop()">Pop</button>
-          <addModal :showModal="is_Show" :generateNewFact="newFacts" @itemAdded="handleItemAdded"
-            @closeModal="handleFetchSuccess()" />
+          <button @click="handleDelete()" v-if="shouldShowDelete">Delete</button>
+          <button @click="handleCancel()" v-if="!shouldShowDelete">Cancel</button>
+          <button @click="handleUpdate()" v-if="shouldShowUpdate">Change Fact</button>
+          <addModal :showModal="shouldShowAddModal" :generateNewFact="isNewFacts" @itemAdded="handleItemAdded"
+            @closeModal="closeModal()" />
+          <editModal :showModal="shouldShowEditModal" :passedCatFactsText="itemSelectedFactText"
+            @closeModal="closeModal()" @itemUpdated="handleItemUpdated" />
         </div>
       </center>
     </div>
@@ -29,44 +35,60 @@
 
 <script setup lang="ts">
 import addModal from '@/components/add-modal.vue';
+import editModal from '@/components/edit-modal.vue';
 import itemCount from '@/components/item-count.vue';
 import ItemTable from '@/components/item-table.vue';
 import { storeLocalStorage, useItem } from '@/composable/use-item';
 import type { Facts } from '@/types/facts';
 import { onMounted, ref } from 'vue';
 
-const { addItem, getItem, popItem } = useItem()
+const { addItem, getItem, popItem, updateItem } = useItem()
 
 onMounted(() => {
-  fetchItemData(),
-    storeLocalStorage(),
-    generateNewFacts()
+  fetchItemData();
+  storeLocalStorage();
+  generateNewFacts();
 })
 
 const item = ref<Facts[]>([])
-const is_Show = ref<boolean>()
-const count = ref<number>();
-const newFacts = ref<boolean>();
+const shouldShowAddModal = ref<boolean>()
+const shouldShowEditModal = ref<boolean>()
+const itemSelectedFactText = ref<string>();
+const isNewFacts = ref<boolean>();
+const isDelete = ref<boolean>();
+const shouldShowDelete = ref<boolean>(true)
+const shouldShowUpdate = ref<boolean>(true)
+const isEdit = ref<boolean>(false);
 
 async function fetchItemData() {
   const itemsLoaded = await getItem();
   item.value = itemsLoaded as Facts[];
 }
 
-function generateNewFacts(): void {
-  newFacts.value = true;
+function reloadItems(selector: string): void {
+  if (selector === "pop") popItem();
+  else if (selector === "add") fetchItemData();
+  else if (selector === "update") handleCancel();
+  else return;
+
+  storeLocalStorage();
 }
 
-function currentCount() {
-  count.value = item.value.length
-  if (count.value < 0) {
-    count.value = 0
+function generateNewFacts(): void {
+  isNewFacts.value = true;
+}
+
+function currentItemCount(): number {
+  const itemCount = ref<number>();
+  itemCount.value = item.value.length
+  if (itemCount.value < 0) {
+    itemCount.value = 0
   }
-  return count.value
+  return itemCount.value
 }
 
 function showAddModal(): void {
-  is_Show.value = true;
+  shouldShowAddModal.value = true;
 }
 
 function handleGenerate(): void {
@@ -74,25 +96,53 @@ function handleGenerate(): void {
   showAddModal();
 }
 
-function handleFetchSuccess(): void {
-  closeModal();
-}
-
 function closeModal() {
-  is_Show.value = false;
-  newFacts.value = false;
+  shouldShowAddModal.value = false;
+  shouldShowEditModal.value = false;
+  isNewFacts.value = false;
 }
 
-function handleItemAdded(itemAdd: string, itemDate: number): void {
-  addItem(itemAdd, itemDate)
-  fetchItemData()
-  storeLocalStorage()
+function handleItemAdded(itemFact: string, itemDate: number): void {
+  addItem(itemFact, itemDate)
+  reloadItems("add");
+}
+
+function handleItemUpdated(previousItemFact: string, itemFactUpdate: string, itemDateUpdate: number): void {
+  updateItem(previousItemFact, itemFactUpdate, itemDateUpdate);
+  reloadItems("update");
 }
 
 function handlePop() {
-  popItem()
-  storeLocalStorage()
+  reloadItems("pop")
 }
+
+function handleDelete() {
+  isDelete.value = true;
+  shouldShowDelete.value = false;
+  shouldShowUpdate.value = false;
+}
+
+function handleCancel() {
+  isDelete.value = false;
+  isEdit.value = false;
+  shouldShowDelete.value = true;
+  shouldShowUpdate.value = true;
+}
+
+function handleUpdate() {
+  isEdit.value = true;
+  shouldShowUpdate.value = false;
+  shouldShowDelete.value = false;
+}
+
+function handleShowEditModal(emitted: boolean) {
+  shouldShowEditModal.value = emitted;
+}
+
+function handleCurrentCatFactsText(selectedFactText: string): void {
+  itemSelectedFactText.value = selectedFactText;
+}
+
 </script>
 
 <style scoped>
@@ -124,5 +174,9 @@ function handlePop() {
   width: 5vw;
   height: 5vw;
   margin-top: var(--section-gap);
+}
+
+button {
+  margin-right: var(--section-gap)
 }
 </style>
