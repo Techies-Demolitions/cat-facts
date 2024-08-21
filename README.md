@@ -2,7 +2,7 @@
 This repository stores random cat facts using the Cat Facts API. It was created as a learning exercise.
 
 ## IMPORTANT!
-DO NOT PUSH DIRECTLY TO THE MAIN BRANCH OR ELSE...
+DO NOT PUSH DIRECTLY TO THE MAIN BRANCH OR I WILL KILL Y...
 
 Just kidding. But seriously, don't.
 
