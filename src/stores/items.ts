@@ -15,10 +15,10 @@ export const useItemStore = defineStore('items', () => {
   const id = ref<number>(items.value.length)
 
   // Actions
-  function addItemStore(itemName: string, date: number) {
+  function addItemStore(facts: string, date: number) {
     const item = {
       id: id.value++,
-      facts: itemName,
+      facts: facts,
       dateCreated: date
     }
     items.value.push(item as Facts)
@@ -37,13 +37,12 @@ export const useItemStore = defineStore('items', () => {
     id.value -= 1
   }
 
-  function updateItemStore(updatedItem: Facts) {
-    const locale = items.value.findIndex((items) => items.id === updatedItem.id)
-    if (locale === -1) {
-      items.value[locale] = updatedItem
-    } else {
-      throw new Error('Item not found')
-    }
+  function updateItemStore(previousFacts: string, updatedFacts: string, updatedDate: number) {
+    const locale = items.value.findIndex((items) => items.facts === previousFacts)
+    if (locale === -1) throw new Error('Item not found')
+
+    items.value[locale].facts = updatedFacts
+    items.value[locale].dateCreated = updatedDate
   }
 
   async function getItemStore() {

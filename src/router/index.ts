@@ -23,6 +23,11 @@ const router = createRouter({
       path: '/itemTable',
       name: 'itemTable',
       component: () => import('../components/item-table.vue')
+    },
+    {
+      path: '/editModal',
+      name: 'editModal',
+      component: () => import('../components/edit-modal.vue')
     }
   ]
 })

@@ -1,7 +1,7 @@
 <template>
     <div id="contain">
-        <button @click="toggleShowText()" id="showAllButton">{{ showText }}</button>
-        <div v-if="!toggle">
+        <button @click="toggleShowTextMethod()" id="showAllButton">{{ showText }}</button>
+        <div v-if="!toggleShowText">
             <table>
                 <tr>
                     <th>Id</th>
@@ -11,10 +11,11 @@
                     </th>
                     <th>Facts</th>
                 </tr>
-                <tr v-for="items in displayItems " :key="items.id">
-                    <td class="modifiedItems">{{ items.id }}</td>
-                    <td class="modifiedItems">{{ items.dateCreated }}</td>
-                    <td>{{ items.facts }}</td>
+                <tr v-for="facts in displayItems " :key="facts.id" :class="tableRowStyle"
+                    @click="handleSelectFact(facts)">
+                    <td class="modifiedItems">{{ facts.id }}</td>
+                    <td class="modifiedItems">{{ facts.dateCreated }}</td>
+                    <td>{{ facts.facts }}</td>
                 </tr>
             </table>
         </div>
@@ -22,37 +23,113 @@
 </template>
 
 <script setup lang="ts">
-import { useItem } from '@/composable/use-item';
+import { storeLocalStorage, useItem } from '@/composable/use-item';
 import type { Facts } from '@/types/facts';
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 
-const { getItem } = useItem()
+const { getItem, deleteItem, updateItem } = useItem()
 
 onMounted(async () => {
     await fetchItems()
 })
 
+const displayItems = ref<Facts[]>([])
+const showText = ref<string>("Show All")
+const toggleShowText = ref<boolean>(true)
+const isDeleteValue = ref<boolean>(false)
+const isEditValue = ref<boolean>(false)
+
+const props = defineProps({
+    isDelete: Boolean,
+    isEdit: Boolean
+})
+
+const emit = defineEmits(["showEditModal", "currentCatFactsText"])
+
+watch(
+    () => props.isDelete,
+    (newValue) => {
+        isDeleteValue.value = newValue;
+    }
+)
+
+watch(
+    () => props.isEdit,
+    (newValue) => {
+        isEditValue.value = newValue
+    }
+)
+
 async function fetchItems() {
     const fetchedItems = await getItem()
-    displayItems.value = fetchedItems as Facts[]
+    const sortItems = ref<Facts[]>([])
+    sortItems.value = fetchedItems as Facts[]
+    displayItems.value = sortItems.value.sort((a, b) => a.id - b.id);
 }
 
-const displayItems = ref<Facts[]>([])
-
-const showText = ref<string>("Show All")
-const toggle = ref<boolean>(true)
-
-function toggleShowText() {
-    toggle.value = !toggle.value
-    if (toggle.value) {
-        showText.value = "Show All"
-    } else {
-        showText.value = "Hide All"
-    }
+function refetchItems(): void {
+    fetchItems();
 }
+
+function reloadItems(): void {
+    refetchItems();
+    storeLocalStorage();
+}
+
+function toggleShowTextMethod(): void {
+    toggleShowText.value = !toggleShowText.value
+    showText.value = toggleShowText.value ? "Show All" : "Hide All";
+}
+
+function isToolClicked(): boolean {
+    return isDeleteValue.value || isEditValue.value
+}
+
+function handleIsEditOrDelete(): boolean {
+    return isDeleteValue.value
+}
+
+const tableRowStyle = computed(() => ({
+    'default-row-style': isToolClicked(),
+    [handleIsEditOrDelete() ? 'hover-row-style-red' : 'hover-row-style-green']: isToolClicked()
+}))
+
+function handleSelectFact(itemSelected: Facts): void {
+    if (isDeleteValue.value) handleDelete(itemSelected);
+    if (isEditValue.value) handleUpdate(itemSelected.facts);
+    reloadItems();
+}
+
+function handleDelete(itemSelectedDelete: Facts): void {
+    deleteItem(itemSelectedDelete);
+}
+
+function handleUpdate(itemSelectedFact: string): void {
+    emit("currentCatFactsText", itemSelectedFact)
+    toggleShowEditModal()
+}
+
+function toggleShowEditModal(): void {
+    emit("showEditModal", true)
+}
+
 </script>
 
 <style scoped>
+.default-row-style {
+    background: rgb(104, 92, 92);
+}
+
+.hover-row-style-red:hover {
+    background-color: red;
+    cursor: var(--cursor-pointer)
+}
+
+.hover-row-style-green:hover {
+    background-color: green;
+    cursor: var(--cursor-pointer)
+}
+
 #contain {
     border: 1px solid #512B81;
     margin-top: 1vw;
@@ -82,6 +159,7 @@ td {
 th {
     border: 1px solid #8CABFF;
     color: var(--color-heading);
+    text-align: center;
 }
 
 .modifiedItems {
