@@ -4,7 +4,6 @@ Store Random Cat Facts using Cat Facts API
 ----------------------------------------------------------------------------
 
 BEFORE EVERYTHING ELSE!
-LISTEN! HEAR! SEE! WHATEVER!
 
 STRICTLY DO NOT WRITE MAIN BRANCH OR I WILL KILL Y..
 
@@ -20,3 +19,4 @@ To say this differently, branches are used to push into this branch for safety p
 
 PS
 - This repository is free and with that I can't set rules for branch protection. Obey my rules or die with the hand of God!
+- Also, will add more rulesets in the future. Kapoy pako.
