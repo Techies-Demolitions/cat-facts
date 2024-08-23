@@ -1,6 +1,6 @@
 <template>
   <main>
-    <div id="container">
+    <div id="container" class="nes-container is-dark">
       <center>
         <div id="header">
           <center>
@@ -13,20 +13,22 @@
 
         <div id="content">
           <itemCount :itemCountAtCurrent="currentItemCount()" />
-          <ItemTable :isDelete="isDelete" :isEdit="isEdit" @showEditModal="handleShowEditModal"
-            @currentCatFactsText="handleCurrentCatFactsText" />
+          <button class="nes-btn" @click="toggleShowTextMethod()" id="showAllButton">{{ showText }}</button>
+          <ItemTable :isDelete="isDelete" :isEdit="isEdit" :toggleShowText="toggleShowText"
+            @showEditModal="showEditModal" @currentCatFactsText="handleCurrentCatFactsText" />
         </div>
 
         <div id="footer">
-          <button @click="handleGenerate()">Generate</button>
-          <button @click="handlePop()">Pop</button>
-          <button @click="handleDelete()" v-if="shouldShowDelete">Delete</button>
-          <button @click="handleCancel()" v-if="!shouldShowDelete">Cancel</button>
-          <button @click="handleUpdate()" v-if="shouldShowUpdate">Change Fact</button>
+          <button type="button" class="nes-btn is-primary" @click="handleGenerate()">Generate</button>
+          <button type="button" class="nes-btn is-warning" @click="handlePop()">Pop</button>
+          <button type="button" class="nes-btn is-error" @click="handleDelete()" v-if="shouldShowDelete">Delete</button>
+          <button class="nes-btn" @click="handleCancel()" v-if="!shouldShowDelete">Cancel</button>
+          <button type="button" class="nes-btn is-success" @click="handleUpdate()" v-if="shouldShowUpdate">Change
+            Fact</button>
           <addModal :showModal="shouldShowAddModal" :generateNewFact="isNewFacts" @itemAdded="handleItemAdded"
             @closeModal="closeModal()" />
           <editModal :showModal="shouldShowEditModal" :passedCatFactsText="itemSelectedFactText"
-            @closeModal="closeModal()" @itemUpdated="handleItemUpdated" />
+            :generateNewFact="isNewFacts" @closeModal="closeModal()" @itemUpdated="handleItemUpdated" />
         </div>
       </center>
     </div>
@@ -59,6 +61,8 @@ const isDelete = ref<boolean>();
 const shouldShowDelete = ref<boolean>(true)
 const shouldShowUpdate = ref<boolean>(true)
 const isEdit = ref<boolean>(false);
+const showText = ref<string>('Hide All')
+const toggleShowText = ref<boolean>(false)
 
 async function fetchItemData() {
   const itemsLoaded = await getItem();
@@ -135,7 +139,7 @@ function handleUpdate() {
   shouldShowDelete.value = false;
 }
 
-function handleShowEditModal(emitted: boolean) {
+function showEditModal(emitted: boolean) {
   shouldShowEditModal.value = emitted;
 }
 
@@ -143,15 +147,25 @@ function handleCurrentCatFactsText(selectedFactText: string): void {
   itemSelectedFactText.value = selectedFactText;
 }
 
+function toggleShowTextMethod(): void {
+  showText.value = toggleShowText.value ? "Hide All" : "Show All";
+  toggleShowText.value = !toggleShowText.value
+}
+
 </script>
 
 <style scoped>
+@media (max-width: 800px) {
+  #container {
+    font-size: 3vw;
+  }
+}
+
 #container {
   height: 20vw;
   width: auto;
   min-width: var(--section-gap);
   padding: var(--section-gap);
-  border: 1px solid var(--color-border);
   height: fit-content;
 }
 
@@ -174,6 +188,10 @@ function handleCurrentCatFactsText(selectedFactText: string): void {
   width: 5vw;
   height: 5vw;
   margin-top: var(--section-gap);
+}
+
+#showAllButton {
+  margin: 0.5vw;
 }
 
 button {

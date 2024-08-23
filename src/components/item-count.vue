@@ -1,5 +1,5 @@
 <template>
-    <div id="contain">
+    <div id="contain" class="nes-container is-dark with-title">
         Total Items: {{ currentItemCount }}
     </div>
 </template>
@@ -22,7 +22,6 @@ watch(() => props.itemCountAtCurrent,
 
 <style scoped>
 #contain {
-    border: 1px solid #512B81;
     width: 100%;
     color: var(--color-heading);
 }

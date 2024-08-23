@@ -1,22 +1,25 @@
 <template>
-    <div id="contain">
-        <button @click="toggleShowTextMethod()" id="showAllButton">{{ showText }}</button>
-        <div v-if="!toggleShowText">
-            <table>
-                <tr>
-                    <th>Id</th>
-                    <th>
-                        Date<br>
-                        (yyyy/mm/dd)
-                    </th>
-                    <th>Facts</th>
-                </tr>
-                <tr v-for="facts in displayItems " :key="facts.id" :class="tableRowStyle"
-                    @click="handleSelectFact(facts)">
-                    <td class="modifiedItems">{{ facts.id }}</td>
-                    <td class="modifiedItems">{{ facts.dateCreated }}</td>
-                    <td>{{ facts.facts }}</td>
-                </tr>
+    <div id="contain" class="nes-container is-dark">
+        <div class="nes-table-responsive" v-if="!shouldShowText">
+            <table class="nes-table is-bordered is-dark">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>
+                            Date<br>
+                            (yyyy/mm/dd)
+                        </th>
+                        <th>Facts</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="facts in displayItems " :key="facts.id" :class="tableRowStyle"
+                        @click="handleSelectFact(facts)">
+                        <td class="modifiedItems">{{ facts.id }}</td>
+                        <td class="modifiedItems">{{ facts.dateCreated }}</td>
+                        <td>{{ facts.facts }}</td>
+                    </tr>
+                </tbody>
             </table>
         </div>
     </div>
@@ -27,21 +30,22 @@ import { storeLocalStorage, useItem } from '@/composable/use-item';
 import type { Facts } from '@/types/facts';
 import { computed, onMounted, ref, watch } from 'vue';
 
-const { getItem, deleteItem, updateItem } = useItem()
+const { getItem, deleteItem } = useItem()
 
 onMounted(async () => {
     await fetchItems()
 })
 
 const displayItems = ref<Facts[]>([])
-const showText = ref<string>("Show All")
-const toggleShowText = ref<boolean>(true)
+
+const shouldShowText = ref<boolean>(false)
 const isDeleteValue = ref<boolean>(false)
 const isEditValue = ref<boolean>(false)
 
 const props = defineProps({
     isDelete: Boolean,
-    isEdit: Boolean
+    isEdit: Boolean,
+    toggleShowText: Boolean
 })
 
 const emit = defineEmits(["showEditModal", "currentCatFactsText"])
@@ -57,6 +61,13 @@ watch(
     () => props.isEdit,
     (newValue) => {
         isEditValue.value = newValue
+    }
+)
+
+watch(
+    () => props.toggleShowText,
+    (newValue) => {
+        shouldShowText.value = newValue
     }
 )
 
@@ -76,10 +87,7 @@ function reloadItems(): void {
     storeLocalStorage();
 }
 
-function toggleShowTextMethod(): void {
-    toggleShowText.value = !toggleShowText.value
-    showText.value = toggleShowText.value ? "Show All" : "Hide All";
-}
+
 
 function isToolClicked(): boolean {
     return isDeleteValue.value || isEditValue.value
@@ -91,7 +99,8 @@ function handleIsEditOrDelete(): boolean {
 
 const tableRowStyle = computed(() => ({
     'default-row-style': isToolClicked(),
-    [handleIsEditOrDelete() ? 'hover-row-style-red' : 'hover-row-style-green']: isToolClicked()
+    [handleIsEditOrDelete() ? 'hover-row-style-red' : 'hover-row-style-green']: isToolClicked(),
+    "nes-pointer": isToolClicked()
 }))
 
 function handleSelectFact(itemSelected: Facts): void {
@@ -121,44 +130,31 @@ function toggleShowEditModal(): void {
 }
 
 .hover-row-style-red:hover {
-    background-color: red;
-    cursor: var(--cursor-pointer)
+    background-color: #E03838;
 }
 
 .hover-row-style-green:hover {
-    background-color: green;
-    cursor: var(--cursor-pointer)
+    background-color: #00A800;
 }
 
 #contain {
-    border: 1px solid #512B81;
-    margin-top: 1vw;
     height: fit-content;
-    padding: var(--section-gap);
-}
-
-#showAllButton {
-    margin: 0.5vw;
-}
-
-table {
-    border: 1px solid #4477CE;
     width: 100%;
     padding: var(--section-gap);
 }
 
+table {
+    /* width: 100%;
+    padding: var(--section-gap); */
+}
+
 td {
-    border-left: 1px solid #8CABFF;
-    border-bottom: 1px solid #8CABFF;
-    border-right: 1px solid #8CABFF;
-    min-width: 150px;
+    /* min-width: 150px;
     text-align: justify;
-    padding: var(--section-gap);
+    padding: var(--section-gap); */
 }
 
 th {
-    border: 1px solid #8CABFF;
-    color: var(--color-heading);
     text-align: center;
 }
 
