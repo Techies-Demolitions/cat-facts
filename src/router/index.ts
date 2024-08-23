@@ -28,6 +28,11 @@ const router = createRouter({
       path: '/editModal',
       name: 'editModal',
       component: () => import('../components/edit-modal.vue')
+    },
+    {
+      path: '/guide',
+      name: 'ballooonGuide',
+      component: () => import('../components/balloon-guide.vue')
     }
   ]
 })
