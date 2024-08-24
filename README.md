@@ -6,8 +6,9 @@ Welcome to the Cat Facts Repository! This project stores and manages random cat 
 - Pop Stored Data: Press the `Pop` button to remove the most recently added cat fact from storage.
 - Delete Specific Data: Press the `Delete` button to select and delete specific cat facts from your stored list.
 - Change a Fact: Press the `Change Fact` button to select a cat fact you'd like to modify.
-- 
-  ![pic3](https://github.com/user-attachments/assets/be3a7467-785a-4aac-ad79-ba59ad874336)
+  
+![pic3](https://github.com/user-attachments/assets/be3a7467-785a-4aac-ad79-ba59ad874336)
+
 ## Dependencies
 This project utilizes the following dependencies:
 
