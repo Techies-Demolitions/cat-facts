@@ -19,10 +19,16 @@
         </div>
 
         <div id="footer">
-          <button type="button" class="nes-btn is-primary" @click="handleGenerate()">Generate</button>
-          <button type="button" class="nes-btn is-warning" @click="handlePop()">Pop</button>
+          <!-- Generate -->
+          <button type="button" @click="handleGenerate()" :class="isGenerateButtonStyle"
+            :disabled="isDisabled()">Generate</button>
+          <!-- Pop -->
+          <button type="button" @click="handlePop()" :class="isPopButtonStyle" :disabled="isDisabled()">Pop</button>
+          <!-- Delete -->
           <button type="button" class="nes-btn is-error" @click="handleDelete()" v-if="shouldShowDelete">Delete</button>
+          <!-- Cancel -->
           <button class="nes-btn" @click="handleCancel()" v-if="!shouldShowDelete">Cancel</button>
+          <!-- Change -->
           <button type="button" class="nes-btn is-success" @click="handleUpdate()" v-if="shouldShowUpdate">Change
             Fact</button>
           <addModal :showModal="shouldShowAddModal" :generateNewFact="isNewFacts" @itemAdded="handleItemAdded"
@@ -42,7 +48,7 @@ import itemCount from '@/components/item-count.vue';
 import ItemTable from '@/components/item-table.vue';
 import { storeLocalStorage, useItem } from '@/composable/use-item';
 import type { Facts } from '@/types/facts';
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 
 const { addItem, getItem, popItem, updateItem } = useItem()
 
@@ -52,6 +58,7 @@ onMounted(() => {
   generateNewFacts();
 })
 
+// declarations
 const item = ref<Facts[]>([])
 const shouldShowAddModal = ref<boolean>()
 const shouldShowEditModal = ref<boolean>()
@@ -64,6 +71,7 @@ const isEdit = ref<boolean>(false);
 const showText = ref<string>('Hide All')
 const toggleShowText = ref<boolean>(false)
 
+// functions
 async function fetchItemData() {
   const itemsLoaded = await getItem();
   item.value = itemsLoaded as Facts[];
@@ -73,6 +81,7 @@ function reloadItems(selector: string): void {
   if (selector === "pop") popItem();
   else if (selector === "add") fetchItemData();
   else if (selector === "update") handleCancel();
+
   else return;
 
   storeLocalStorage();
@@ -88,6 +97,7 @@ function currentItemCount(): number {
   if (itemCount.value < 0) {
     itemCount.value = 0
   }
+
   return itemCount.value
 }
 
@@ -111,8 +121,8 @@ function handleItemAdded(itemFact: string, itemDate: number): void {
   reloadItems("add");
 }
 
-function handleItemUpdated(previousItemFact: string, itemFactUpdate: string, itemDateUpdate: number): void {
-  updateItem(previousItemFact, itemFactUpdate, itemDateUpdate);
+function handleItemUpdated(previousItemId: number, itemFactUpdate: string, itemDateUpdate: number): void {
+  updateItem(previousItemId, itemFactUpdate, itemDateUpdate);
   reloadItems("update");
 }
 
@@ -139,6 +149,10 @@ function handleUpdate() {
   shouldShowDelete.value = false;
 }
 
+function isDeleteOrEditActive(): boolean {
+  return isDelete.value || isEdit.value
+}
+
 function showEditModal(emitted: boolean) {
   shouldShowEditModal.value = emitted;
 }
@@ -150,6 +164,20 @@ function handleCurrentCatFactsText(selectedFactText: string): void {
 function toggleShowTextMethod(): void {
   showText.value = toggleShowText.value ? "Hide All" : "Show All";
   toggleShowText.value = !toggleShowText.value
+}
+
+const isGenerateButtonStyle = computed(() => ({
+  "nes-btn is-disabled": isDisabled(),
+  "nes-btn is-primary": !isDisabled()
+}))
+
+const isPopButtonStyle = computed(() => ({
+  "nes-btn is-disabled": isDisabled(),
+  "nes-btn is-warning": !isDisabled()
+}))
+
+function isDisabled(): boolean {
+  return isDeleteOrEditActive()
 }
 
 </script>

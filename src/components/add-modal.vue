@@ -1,9 +1,9 @@
 <template>
     <div id="myModal" class="modal" :style="getStyle" ref="modal">
         <!-- Modal content -->
-        <div class="modal-content">
-            <span class="close" @click="closeModal">&times;</span>
-            <p style="color: var(--color-text);">
+        <div class="modal-content" :class="modalContentStyle">
+            <span id="close" :class="nesPointer" @click="closeModal" v-if="shouldShowTools">&times;</span>
+            <p id="showFacts">
                 {{ showFacts() }}
             </p><br>
             <div style="display:inline" v-if="shouldShowTools">
@@ -30,6 +30,7 @@ const props = defineProps({
 
 const emit = defineEmits(["closeModal", "itemAdded", "factsForCats"]);
 
+// declarations
 const isActive = ref<boolean>(false);
 const catFactsText = ref<string>('');
 const catFactsDate = ref<number>();
@@ -37,11 +38,12 @@ const generateNewFactsIsTrigger = ref<boolean>();
 const shouldShowTools = ref<boolean>(true);
 const modal = ref<HTMLElement | null>(null);
 
+// functions
 async function fetchCatData() {
     const fetchedCatFactsData = await getCatFacts();
 
-    if (typeof (fetchedCatFactsData) === "string") { // responds bad request
-        catFactsText.value = fetchedCatFactsData
+    if (typeof (fetchedCatFactsData) !== "object") { // responds bad request
+        catFactsText.value = FactsThings.ErrorMessage;
         return
     }
 
@@ -72,6 +74,14 @@ const getStyle = computed(() => ({
     display: isActive.value ? 'block' : 'none'
 }));
 
+const modalContentStyle = computed(() => ({
+    'modal-content-shouldShowTools': !shouldShowTools.value
+}));
+
+const nesPointer = computed(() => ({
+    'nes-pointer': true
+}))
+
 function handleClickOutside(event: MouseEvent) {
     if (modal.value && event.target === modal.value) {
         closeModal();
@@ -95,6 +105,7 @@ function showFacts() {
     return catFactsText.value;
 }
 
+// watchers
 watch(
     () => props.showModal,
     (newValue) => {
@@ -117,9 +128,10 @@ watch(
 watch(
     () => catFactsText.value,
     (itsNewValue) => {
-        if (itsNewValue === FactsThings.Generating) {
+        if (itsNewValue === FactsThings.Generating || itsNewValue === FactsThings.ErrorMessage) {
             shouldShowTools.value = false
-        } else {
+        }
+        else {
             shouldShowTools.value = true
         }
     },
@@ -154,6 +166,16 @@ watch(
     width: 25%;
     height: fit-content;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    color: var(--color-text);
+}
+
+.modal-content-shouldShowTools {
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    flex-wrap: wrap;
+    place-content: center;
+    place-items: center;
 }
 
 @media (max-width: 800px) {
@@ -164,16 +186,26 @@ watch(
 }
 
 /* The Close Button */
-.close {
+#close {
     color: red;
     float: right;
     font-size: 28px;
+    padding: 1px;
 }
 
-.close:hover,
-.close:focus {
+#close:hover,
+#close:focus {
     color: #000;
     text-decoration: none;
-    cursor: pointer;
+}
+
+#showFacts {
+    color: var(--color-text);
+    display: flex;
+    place-content: center;
+    place-items: center;
+    justify-content: center;
+    text-align: center;
+    flex-wrap: wrap;
 }
 </style>

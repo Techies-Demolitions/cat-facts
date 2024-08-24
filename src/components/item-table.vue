@@ -36,12 +36,6 @@ onMounted(async () => {
     await fetchItems()
 })
 
-const displayItems = ref<Facts[]>([])
-
-const shouldShowText = ref<boolean>(false)
-const isDeleteValue = ref<boolean>(false)
-const isEditValue = ref<boolean>(false)
-
 const props = defineProps({
     isDelete: Boolean,
     isEdit: Boolean,
@@ -50,6 +44,63 @@ const props = defineProps({
 
 const emit = defineEmits(["showEditModal", "currentCatFactsText"])
 
+// declarations
+const displayItems = ref<Facts[]>([])
+const shouldShowText = ref<boolean>(false)
+const isDeleteValue = ref<boolean>(false)
+const isEditValue = ref<boolean>(false)
+
+// functions
+async function fetchItems() {
+    const fetchedItems = await getItem()
+    const sortItems = ref<Facts[]>([])
+    sortItems.value = fetchedItems as Facts[]
+    displayItems.value = sortItems.value.sort((a, b) => a.id - b.id);
+}
+
+function refetchItems(): void {
+    fetchItems();
+}
+
+function reloadItems(): void {
+    refetchItems();
+    storeLocalStorage();
+}
+
+function isToolClicked(): boolean {
+    return isDeleteValue.value || isEditValue.value
+}
+
+function handleIsEditOrDelete(): boolean {
+    return isDeleteValue.value
+}
+
+const tableRowStyle = computed(() => ({
+    'default-row-style': isToolClicked(),
+    [handleIsEditOrDelete() ? 'hover-row-style-red' : 'hover-row-style-green']: isToolClicked(),
+    "nes-pointer": isToolClicked()
+}))
+
+function handleSelectFact(itemSelected: Facts): void {
+    if (isDeleteValue.value) handleDelete(itemSelected);
+    if (isEditValue.value) handleUpdate(itemSelected.id);
+    reloadItems();
+}
+
+function handleDelete(itemSelectedDelete: Facts): void {
+    deleteItem(itemSelectedDelete);
+}
+
+function handleUpdate(itemSelectedId: number): void {
+    emit("currentCatFactsText", itemSelectedId)
+    toggleShowEditModal()
+}
+
+function toggleShowEditModal(): void {
+    emit("showEditModal", true)
+}
+
+// watchers
 watch(
     () => props.isDelete,
     (newValue) => {
@@ -71,56 +122,6 @@ watch(
     }
 )
 
-async function fetchItems() {
-    const fetchedItems = await getItem()
-    const sortItems = ref<Facts[]>([])
-    sortItems.value = fetchedItems as Facts[]
-    displayItems.value = sortItems.value.sort((a, b) => a.id - b.id);
-}
-
-function refetchItems(): void {
-    fetchItems();
-}
-
-function reloadItems(): void {
-    refetchItems();
-    storeLocalStorage();
-}
-
-
-
-function isToolClicked(): boolean {
-    return isDeleteValue.value || isEditValue.value
-}
-
-function handleIsEditOrDelete(): boolean {
-    return isDeleteValue.value
-}
-
-const tableRowStyle = computed(() => ({
-    'default-row-style': isToolClicked(),
-    [handleIsEditOrDelete() ? 'hover-row-style-red' : 'hover-row-style-green']: isToolClicked(),
-    "nes-pointer": isToolClicked()
-}))
-
-function handleSelectFact(itemSelected: Facts): void {
-    if (isDeleteValue.value) handleDelete(itemSelected);
-    if (isEditValue.value) handleUpdate(itemSelected.facts);
-    reloadItems();
-}
-
-function handleDelete(itemSelectedDelete: Facts): void {
-    deleteItem(itemSelectedDelete);
-}
-
-function handleUpdate(itemSelectedFact: string): void {
-    emit("currentCatFactsText", itemSelectedFact)
-    toggleShowEditModal()
-}
-
-function toggleShowEditModal(): void {
-    emit("showEditModal", true)
-}
 
 </script>
 
@@ -143,15 +144,18 @@ function toggleShowEditModal(): void {
     padding: var(--section-gap);
 }
 
-table {
-    /* width: 100%;
-    padding: var(--section-gap); */
+@media (max-width: 800px) {
+    #contain {
+        height: 350px;
+        overflow: auto;
+    }
 }
 
+
 td {
-    /* min-width: 150px;
+    min-width: 150px;
     text-align: justify;
-    padding: var(--section-gap); */
+    padding: var(--section-gap);
 }
 
 th {
