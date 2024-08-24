@@ -22,11 +22,14 @@
                 </tbody>
             </table>
         </div>
+        <div v-else style="color:var(--color-text)">
+            Nothing Here
+        </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import { storeLocalStorage, useItem } from '@/composable/use-item';
+import { useLocalStorage, useItem } from '@/composable/use-item';
 import type { Facts } from '@/types/facts';
 import { computed, onMounted, ref, watch } from 'vue';
 
@@ -64,7 +67,7 @@ function refetchItems(): void {
 
 function reloadItems(): void {
     refetchItems();
-    storeLocalStorage();
+    useLocalStorage();
 }
 
 function isToolClicked(): boolean {
