@@ -1,7 +1,7 @@
 <template>
     <div id="contain" class="nes-container is-dark">
         <div class="nes-table-responsive" v-if="!shouldShowText">
-            <table class="nes-table is-bordered is-dark">
+            <table class="nes-table is-bordered is-dark" v-if="isFactsArrayNotEmpty()">
                 <thead>
                     <tr>
                         <th>Id</th>
@@ -21,6 +21,9 @@
                     </tr>
                 </tbody>
             </table>
+            <div v-else style="color:var(--color-text)">
+                Nothing Here
+            </div>
         </div>
         <div v-else style="color:var(--color-text)">
             Nothing Here
@@ -101,6 +104,12 @@ function handleUpdate(itemSelectedId: number): void {
 
 function toggleShowEditModal(): void {
     emit("showEditModal", true)
+}
+
+function isFactsArrayNotEmpty(): boolean {
+    const result = displayItems.value.length;
+
+    return result !== 0
 }
 
 // watchers
