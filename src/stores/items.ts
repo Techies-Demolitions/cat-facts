@@ -1,4 +1,5 @@
 import { piniaInstance } from '@/global'
+import { retrieveLocalData, saveLocalData } from '@/local storage/local-storage'
 import type { Facts } from '@/types/facts'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
@@ -6,7 +7,7 @@ import { ref } from 'vue'
 export const useItemStore = defineStore('items', () => {
   const items = ref<Facts[]>([])
 
-  const getItemData: any = localStorage.getItem('itemsStored')
+  const getItemData = retrieveLocalData()
 
   // local storage data
   if (getItemData !== null) {
@@ -63,8 +64,8 @@ export const useItemStore = defineStore('items', () => {
     return id.value
   }
 
-  async function saveData() {
-    localStorage.setItem('itemsStored', JSON.stringify(items.value))
+  async function useLocalStorageStore() {
+    saveLocalData(items.value)
   }
 
   return {
@@ -73,9 +74,8 @@ export const useItemStore = defineStore('items', () => {
     popItemStore,
     updateItemStore,
     getItemStore,
-    items,
     getIdCount,
     deleteItemStore,
-    saveData
+    saveData: useLocalStorageStore
   }
 })(piniaInstance)

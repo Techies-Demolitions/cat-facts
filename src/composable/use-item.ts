@@ -37,7 +37,7 @@ export function useItem() {
 }
 
 // useLocalStorage
-export async function storeLocalStorage() {
+export async function useLocalStorage() {
   await itemStore.saveData()
 }
 

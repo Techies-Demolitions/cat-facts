@@ -46,7 +46,7 @@ import addModal from '@/components/add-modal.vue';
 import editModal from '@/components/edit-modal.vue';
 import itemCount from '@/components/item-count.vue';
 import ItemTable from '@/components/item-table.vue';
-import { storeLocalStorage, useItem } from '@/composable/use-item';
+import { useLocalStorage, useItem } from '@/composable/use-item';
 import type { Facts } from '@/types/facts';
 import { computed, onMounted, ref } from 'vue';
 
@@ -54,7 +54,7 @@ const { addItem, getItem, popItem, updateItem } = useItem()
 
 onMounted(() => {
   fetchItemData();
-  storeLocalStorage();
+  useLocalStorage();
   generateNewFacts();
 })
 
@@ -84,7 +84,7 @@ function reloadItems(selector: string): void {
 
   else return;
 
-  storeLocalStorage();
+  useLocalStorage();
 }
 
 function generateNewFacts(): void {
@@ -159,6 +159,7 @@ function showEditModal(emitted: boolean) {
 
 function handleCurrentCatFactsText(selectedFactText: string): void {
   itemSelectedFactText.value = selectedFactText;
+  generateNewFacts();
 }
 
 function toggleShowTextMethod(): void {
