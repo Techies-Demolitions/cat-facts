@@ -8,11 +8,22 @@ export const useItemStore = defineStore('items', () => {
 
   const getItemData: any = localStorage.getItem('itemsStored')
 
+  // local storage data
   if (getItemData !== null) {
     items.value = JSON.parse(getItemData)
   }
 
-  const id = ref<number>(items.value.length)
+  function findLastIndexID(Items: Facts[]): number {
+    const lastIndex = ref<number>(0)
+    lastIndex.value = Items.length
+    if (lastIndex.value <= 0) return 0
+
+    return items.value[lastIndex.value - 1].id + 1
+  }
+
+  // ID value
+  const id = ref<number>(0)
+  id.value = findLastIndexID(items.value)
 
   // Actions
   function addItemStore(facts: string, date: number) {
@@ -34,11 +45,10 @@ export const useItemStore = defineStore('items', () => {
 
   function popItemStore() {
     items.value.pop()
-    id.value -= 1
   }
 
-  function updateItemStore(previousFacts: string, updatedFacts: string, updatedDate: number) {
-    const locale = items.value.findIndex((items) => items.facts === previousFacts)
+  function updateItemStore(previousFactsId: number, updatedFacts: string, updatedDate: number) {
+    const locale = items.value.findIndex((items) => items.id === previousFactsId)
     if (locale === -1) throw new Error('Item not found')
 
     items.value[locale].facts = updatedFacts

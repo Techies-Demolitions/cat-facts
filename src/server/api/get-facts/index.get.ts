@@ -5,8 +5,7 @@ export async function getCatFactsData() {
   try {
     const response = await fetch(catUrl)
     if (!response.ok) {
-      console.error(response.statusText)
-      return response.statusText
+      throw new Error(response.statusText)
     }
     const data = await response.json()
 
