@@ -4,6 +4,7 @@ import { FactsThings } from '@/enums/enums'
 export async function getCatFactsData() {
   try {
     const response = await fetch(catUrl)
+
     if (!response.ok) {
       throw new Error(response.statusText)
     }

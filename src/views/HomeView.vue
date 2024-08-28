@@ -25,11 +25,13 @@
           <!-- Pop -->
           <button type="button" @click="handlePop()" :class="isPopButtonStyle" :disabled="isDisabled()">Pop</button>
           <!-- Delete -->
-          <button type="button" class="nes-btn is-error" @click="handleDelete()" v-if="shouldShowDelete">Delete</button>
+          <button type="button" class="nes-btn is-error hvr-grow hvr-buzz-out" @click="handleDelete()"
+            v-if="shouldShowDelete">Delete</button>
           <!-- Cancel -->
           <button class="nes-btn" @click="handleCancel()" v-if="!shouldShowDelete">Cancel</button>
           <!-- Change -->
-          <button type="button" class="nes-btn is-success" @click="handleUpdate()" v-if="shouldShowUpdate">Change
+          <button type="button" class="nes-btn is-success hvr-grow" @click="handleUpdate()"
+            v-if="shouldShowUpdate">Change
             Fact</button>
           <addModal :showModal="shouldShowAddModal" :generateNewFact="isNewFacts" @itemAdded="handleItemAdded"
             @closeModal="closeModal()" />
@@ -169,12 +171,14 @@ function toggleShowTextMethod(): void {
 
 const isGenerateButtonStyle = computed(() => ({
   "nes-btn is-disabled": isDisabled(),
-  "nes-btn is-primary": !isDisabled()
+  "nes-btn is-primary": !isDisabled(),
+  "hvr-grow": !isDisabled()
 }))
 
 const isPopButtonStyle = computed(() => ({
   "nes-btn is-disabled": isDisabled(),
-  "nes-btn is-warning": !isDisabled()
+  "nes-btn is-warning": !isDisabled(),
+  "hvr-buzz": !isDisabled()
 }))
 
 function isDisabled(): boolean {
