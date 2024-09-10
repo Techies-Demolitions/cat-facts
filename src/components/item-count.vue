@@ -1,6 +1,6 @@
 <template>
     <div id="contain" class="nes-container is-dark with-title">
-        Total Items: {{ currentItemCount }}
+        Total Items: <span class="nes-text is-error">{{ currentItemCount }}</span>
     </div>
 </template>
 

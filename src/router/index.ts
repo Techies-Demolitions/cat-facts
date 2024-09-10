@@ -10,6 +10,11 @@ const router = createRouter({
       component: HomeView
     },
     {
+      path: '/catFacts',
+      name: 'catFacts',
+      component: () => import('../views/CatFacts.vue')
+    },
+    {
       path: '/addModal',
       name: 'addModal',
       component: () => import('../components/add-modal.vue')
