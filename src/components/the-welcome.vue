@@ -21,7 +21,7 @@
                             <h2>John Vincent Jimar</h2>
                             <span>Software Developer</span><br>
                             <nav>
-                                <a href="https://github.com/Techies-Demolitions/Nuxt-Todolist">
+                                <a href="https://github.com/Techies-John">
                                     <i class="nes-icon github is-medium" style="margin-top:10px;"></i>
                                 </a>
                                 <a href="https://www.linkedin.com/in/johnjimar/">
