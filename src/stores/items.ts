@@ -4,10 +4,20 @@ import type { Facts } from '@/types/facts'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
-export const useItemStore = defineStore('items', () => {
+export const useItemStore = defineStore('facts', () => {
   const items = ref<Facts[]>([])
 
   const getItemData = retrieveLocalData()
+
+  // testing
+  async function fetchdata() {
+    const response = fetch('@/server/api/get-facts')
+
+    if (!(await response).ok) return
+
+    return response
+  }
+  // testing
 
   // local storage data
   if (getItemData !== null) {
@@ -31,7 +41,7 @@ export const useItemStore = defineStore('items', () => {
     const item = {
       id: id.value++,
       facts: facts,
-      dateCreated: date
+      created_at: date
     }
     items.value.push(item as Facts)
   }
@@ -53,7 +63,7 @@ export const useItemStore = defineStore('items', () => {
     if (locale === -1) throw new Error('Item not found')
 
     items.value[locale].facts = updatedFacts
-    items.value[locale].dateCreated = updatedDate
+    items.value[locale].created_at = updatedDate
   }
 
   async function getItemStore() {
@@ -76,6 +86,7 @@ export const useItemStore = defineStore('items', () => {
     getItemStore,
     getIdCount,
     deleteItemStore,
-    saveData: useLocalStorageStore
+    saveData: useLocalStorageStore,
+    fetchdata
   }
 })(piniaInstance)

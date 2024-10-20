@@ -50,7 +50,7 @@ async function fetchCatData() {
         return
     }
     handleIsFactForCats(fetchedCatFactsData.value.facts);
-    insertDate(fetchedCatFactsData.value.dateCreated);
+    insertDate(fetchedCatFactsData.value.created_at);
 }
 
 async function refetchCatData() {

@@ -1,4 +1,5 @@
 <template>
+    <button @click="handleHeyMan()">Hey man</button>
     <div id="contain" class="nes-container is-dark">
         <div class="nes-table-responsive" v-if="!shouldShowText">
             <table class="nes-table is-bordered is-dark" v-if="isFactsArrayNotEmpty()">
@@ -16,7 +17,12 @@
                     <tr v-for="facts in displayItems " :key="facts.id" :class="tableRowStyle"
                         @click="handleSelectFact(facts)">
                         <td class="modifiedItems">{{ facts.id }}</td>
-                        <td class="modifiedItems">{{ facts.dateCreated }}</td>
+                        <td class="modifiedItems">{{ facts.created_at }}</td>
+                        <td>{{ facts.facts }}</td>
+                    </tr>
+                    <tr v-for="facts in testingFacts " :key="facts.id" :class="tableRowStyle">
+                        <td class="modifiedItems">{{ facts.id }}</td>
+                        <td class="modifiedItems">{{ facts.created_at }}</td>
                         <td>{{ facts.facts }}</td>
                     </tr>
                 </tbody>
@@ -32,11 +38,12 @@
 </template>
 
 <script setup lang="ts">
-import { useLocalStorage, useItem } from '@/composable/use-item';
+import { useLocalStorage, useItem, getTestingFacts, useFacts } from '@/composable/use-item';
 import type { Facts } from '@/types/facts';
 import { computed, onMounted, ref, watch } from 'vue';
 
 const { getItem, deleteItem } = useItem()
+const { deleteFacts } = useFacts()
 
 onMounted(async () => {
     await fetchItems()
@@ -55,10 +62,18 @@ const displayItems = ref<Facts[]>([])
 const shouldShowText = ref<boolean>(false)
 const isDeleteValue = ref<boolean>(false)
 const isEditValue = ref<boolean>(false)
+const testingFacts = ref<Facts[]>([])
 
 // functions
+function handleHeyMan() {
+    console.log("Hello man")
+    deleteFacts(2)
+}
+
 async function fetchItems() {
     const fetchedItems = await getItem()
+    const fetchedCatFacts = await getTestingFacts()
+    testingFacts.value = fetchedCatFacts as Facts[]
     const sortItems = ref<Facts[]>([])
     sortItems.value = fetchedItems as Facts[]
     displayItems.value = sortItems.value.sort((a, b) => a.id - b.id);
@@ -72,6 +87,7 @@ function reloadItems(): void {
     refetchItems();
     useLocalStorage();
 }
+
 
 function isToolClicked(): boolean {
     return isDeleteValue.value || isEditValue.value

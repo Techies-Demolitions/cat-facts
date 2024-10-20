@@ -1,5 +1,6 @@
 const catUrl = 'https://cat-fact.herokuapp.com/facts/random'
 import { FactsThings } from '@/enums/enums'
+import { getFactsUseCase } from '@/server/use-case/get-facts/get-facts-use-case'
 
 export async function getCatFactsData() {
   try {
@@ -13,5 +14,15 @@ export async function getCatFactsData() {
     return data
   } catch {
     return FactsThings.ErrorMessage
+  }
+}
+
+export async function getTestingFactsData() {
+  try {
+    const response = await getFactsUseCase()
+
+    return response
+  } catch (error) {
+    console.error(error)
   }
 }

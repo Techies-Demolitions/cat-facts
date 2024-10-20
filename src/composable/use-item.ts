@@ -1,5 +1,8 @@
-import { getCatFactsData } from '@/server/api/get-facts/index.get'
-import { catFactsFactory, formatDateFactory } from '@/factories/facts.factory'
+import { getCatFactsData, getTestingFactsData } from '@/server/api/get-facts/index.get'
+import { catFactsFactory, formatDateFactory } from '@/server/factories/facts.factory'
+import { addFactsUseCase } from '@/server/use-case/add-facts/add-facts-use-case'
+import { deleteFactsUseCase } from '@/server/use-case/delete-facts/delete-facts-use-case'
+import { getFactsUseCase } from '@/server/use-case/get-facts/get-facts-use-case'
 import { useItemStore } from '@/stores/items'
 import type { Facts } from '@/types/facts'
 
@@ -54,4 +57,39 @@ export async function getCatFacts() {
   })
 
   return responseFactory
+}
+
+export async function getTestingFacts() {
+  const response = await getTestingFactsData()
+
+  return response
+}
+
+// useFacts
+export function useFacts() {
+  async function getFacts() {
+    const response = await getFactsUseCase()
+
+    return response
+  }
+
+  async function addFacts(facts: string, date: number) {
+    const response = await addFactsUseCase(facts, date)
+
+    return response
+  }
+
+  function popFacts() {
+    itemStore.popItemStore()
+  }
+
+  async function updateFacts(previousFactsId: number, updatedFacts: string, updatedDate: number) {
+    itemStore.updateItemStore(previousFactsId, updatedFacts, updatedDate)
+  }
+
+  function deleteFacts(id: number) {
+    deleteFactsUseCase(id)
+  }
+
+  return { getFacts, addFacts, updateFacts, popFacts, deleteFacts }
 }
