@@ -1,5 +1,4 @@
 <template>
-    <button @click="handleHeyMan()">Hey man</button>
     <div id="contain" class="nes-container is-dark">
         <div class="nes-table-responsive" v-if="!shouldShowText">
             <table class="nes-table is-bordered is-dark" v-if="isFactsArrayNotEmpty()">
@@ -38,7 +37,7 @@
 </template>
 
 <script setup lang="ts">
-import { useLocalStorage, useItem, getTestingFacts, useFacts } from '@/composable/use-item';
+import { useItem, getTestingFacts, useFacts } from '@/composable/use-item';
 import type { Facts } from '@/types/facts';
 import { computed, onMounted, ref, watch } from 'vue';
 
@@ -65,10 +64,7 @@ const isEditValue = ref<boolean>(false)
 const testingFacts = ref<Facts[]>([])
 
 // functions
-function handleHeyMan() {
-    console.log("Hello man")
-    deleteFacts(2)
-}
+
 
 async function fetchItems() {
     const fetchedItems = await getItem()
@@ -85,7 +81,6 @@ function refetchItems(): void {
 
 function reloadItems(): void {
     refetchItems();
-    useLocalStorage();
 }
 
 

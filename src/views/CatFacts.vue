@@ -23,67 +23,35 @@
             <button class="nes-btn" @click="toggleShowTextMethod()" id="showAllButton">
               {{ showText }}
             </button>
-            <ItemTable
-              :isDelete="isDelete"
-              :isEdit="isEdit"
-              :toggleShowText="toggleShowText"
-              @showEditModal="showEditModal"
-              @currentCatFactsText="handleCurrentCatFactsText"
-            />
+            <ItemTable :isDelete="isDelete" :isEdit="isEdit" :toggleShowText="toggleShowText"
+              @showEditModal="showEditModal" @currentCatFactsText="handleCurrentCatFactsText" />
           </div>
 
           <div id="footer">
             <!-- Generate -->
-            <button
-              type="button"
-              @click="handleGenerate()"
-              :class="isGenerateButtonStyle"
-              :disabled="isDisabled()"
-            >
+            <button type="button" @click="handleGenerate()" :class="isGenerateButtonStyle" :disabled="isDisabled()">
               Generate
             </button>
             <!-- Pop -->
-            <button
-              type="button"
-              @click="handlePop()"
-              :class="isPopButtonStyle"
-              :disabled="isDisabled()"
-            >
+            <button type="button" @click="handlePop()" :class="isPopButtonStyle" :disabled="isDisabled()">
               Pop
             </button>
             <!-- Delete -->
-            <button
-              type="button"
-              class="nes-btn is-error hvr-grow hvr-buzz-out"
-              @click="handleDelete()"
-              v-if="shouldShowDelete"
-            >
+            <button type="button" :class="isDeleteButtonStyle" @click="handleDelete()" v-if="shouldShowDelete"
+              :disabled="isTableEmpty">
               Delete
             </button>
             <!-- Cancel -->
             <button class="nes-btn" @click="handleCancel()" v-if="!shouldShowDelete">Cancel</button>
             <!-- Change -->
-            <button
-              type="button"
-              class="nes-btn is-success hvr-grow"
-              @click="handleUpdate()"
-              v-if="shouldShowUpdate"
-            >
+            <button type="button" :class="isChangeButtonStyle" @click="handleUpdate()" v-if="shouldShowUpdate"
+              :disabled="isTableEmpty">
               Change Fact
             </button>
-            <addModal
-              :showModal="shouldShowAddModal"
-              :generateNewFact="isNewFacts"
-              @itemAdded="handleItemAdded"
-              @closeModal="closeModal()"
-            />
-            <editModal
-              :showModal="shouldShowEditModal"
-              :passedCatFactsText="itemSelectedFactText"
-              :generateNewFact="isNewFacts"
-              @closeModal="closeModal()"
-              @itemUpdated="handleItemUpdated"
-            />
+            <addModal :showModal="shouldShowAddModal" :generateNewFact="isNewFacts" @itemAdded="handleItemAdded"
+              @closeModal="closeModal()" />
+            <editModal :showModal="shouldShowEditModal" :passedCatFactsText="itemSelectedFactText"
+              :generateNewFact="isNewFacts" @closeModal="closeModal()" @itemUpdated="handleItemUpdated" />
           </div>
         </center>
       </div>
@@ -101,16 +69,18 @@ import addModal from '@/components/add-modal.vue'
 import editModal from '@/components/edit-modal.vue'
 import itemCount from '@/components/item-count.vue'
 import ItemTable from '@/components/item-table.vue'
-import { useLocalStorage, useItem, useFacts } from '@/composable/use-item'
+import { useItem, useFacts } from '@/composable/use-item'
+import { useItemStore } from '@/stores/items'
 import type { Facts } from '@/types/facts'
+import { watch } from 'vue'
 import { computed, onMounted, ref } from 'vue'
 
 const { addItem, getItem, popItem, updateItem } = useItem()
 const { addFacts } = useFacts()
+const storeItem = useItemStore
 
 onMounted(() => {
   fetchItemData()
-  useLocalStorage()
   generateNewFacts()
 })
 
@@ -126,9 +96,11 @@ const shouldShowUpdate = ref<boolean>(true)
 const isEdit = ref<boolean>(false)
 const showText = ref<string>('Hide All')
 const toggleShowText = ref<boolean>(false)
+const isTableEmpty = ref();
 
 // functions
 async function fetchItemData() {
+  storeItem.fetchdata();
   const itemsLoaded = await getItem()
   item.value = itemsLoaded as Facts[]
 }
@@ -138,8 +110,6 @@ function reloadItems(selector: string): void {
   else if (selector === 'add') fetchItemData()
   else if (selector === 'update') handleCancel()
   else return
-
-  useLocalStorage()
 }
 
 function generateNewFacts(): void {
@@ -239,9 +209,34 @@ const isPopButtonStyle = computed(() => ({
   'hvr-buzz': !isDisabled()
 }))
 
+const isDeleteButtonStyle = computed(() => ({
+  'nes-btn is-error': !isTableEmpty.value,
+  'hvr-grow': !isTableEmpty.value,
+  'hvr-buzz-out': !isTableEmpty.value,
+  'nes-btn is-disabled': isTableEmpty.value,
+}))
+
+const isChangeButtonStyle = computed(() => ({
+  'nes-btn is-success': !isTableEmpty.value,
+  'hvr-grow': !isTableEmpty.value,
+  'hvr-buzz-out': !isTableEmpty.value,
+  'nes-btn is-disabled': isTableEmpty.value,
+}))
+
 function isDisabled(): boolean {
   return isDeleteOrEditActive()
 }
+
+watch(() => item.value.length, (newValue) => {
+  isTableEmpty.value = newValue === 0;
+  if (!isTableEmpty.value) console.log("Total Hey man: " + item.value.length);
+})
+
+onMounted(() => {
+  console.log("Total Hey man: " + item.value.length);
+  fetchItemData()
+})
+
 </script>
 
 <style scoped>

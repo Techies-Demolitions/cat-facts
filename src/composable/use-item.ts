@@ -39,11 +39,6 @@ export function useItem() {
   return { getItem, setItem, addItem, popItem, updateItem, deleteItem }
 }
 
-// useLocalStorage
-export async function useLocalStorage() {
-  await itemStore.saveData()
-}
-
 // useAPI
 export async function getCatFacts() {
   const facts = await getCatFactsData()

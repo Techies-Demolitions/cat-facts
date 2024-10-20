@@ -1,5 +1,4 @@
 import { piniaInstance } from '@/global'
-import { retrieveLocalData, saveLocalData } from '@/local storage/local-storage'
 import type { Facts } from '@/types/facts'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
@@ -7,22 +6,23 @@ import { ref } from 'vue'
 export const useItemStore = defineStore('facts', () => {
   const items = ref<Facts[]>([])
 
-  const getItemData = retrieveLocalData()
-
   // testing
   async function fetchdata() {
-    const response = fetch('@/server/api/get-facts')
-
-    if (!(await response).ok) return
-
-    return response
+    try {
+      const response = await fetch('/api/test/index') // Correct endpoint
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`)
+      }
+      const data = await response.json()
+      console.log(data)
+      return data // Return or store the fetched data as needed
+    } catch (error) {
+      console.error('Failed to fetch:', error)
+      // Handle the error appropriately
+    }
   }
+
   // testing
-
-  // local storage data
-  if (getItemData !== null) {
-    items.value = JSON.parse(getItemData)
-  }
 
   function findLastIndexID(Items: Facts[]): number {
     const lastIndex = ref<number>(0)
@@ -74,10 +74,6 @@ export const useItemStore = defineStore('facts', () => {
     return id.value
   }
 
-  async function useLocalStorageStore() {
-    saveLocalData(items.value)
-  }
-
   return {
     addItemStore,
     setItemStore,
@@ -86,7 +82,6 @@ export const useItemStore = defineStore('facts', () => {
     getItemStore,
     getIdCount,
     deleteItemStore,
-    saveData: useLocalStorageStore,
     fetchdata
   }
 })(piniaInstance)
