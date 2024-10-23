@@ -1,4 +1,4 @@
-import { insertDataIntoFacts } from '@/server/services/catFacts.service'
+import { factsService } from '@/server/services/catFacts.service'
 import type { Facts } from '@/types/facts'
 
 export async function addFactsUseCase(facts: string, created_at: number) {
@@ -6,7 +6,7 @@ export async function addFactsUseCase(facts: string, created_at: number) {
     created_at,
     facts
   }
-  const response = await insertDataIntoFacts(item as Facts)
+  const response = await factsService.insertDataIntoFacts(item as Facts)
 
   return response
 }

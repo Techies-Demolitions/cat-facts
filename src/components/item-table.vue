@@ -37,7 +37,7 @@
 </template>
 
 <script setup lang="ts">
-import { useItem, getTestingFacts, useFacts } from '@/composable/use-item';
+import { useItem, useFacts } from '@/composable/use-facts';
 import type { Facts } from '@/types/facts';
 import { computed, onMounted, ref, watch } from 'vue';
 
@@ -68,8 +68,6 @@ const testingFacts = ref<Facts[]>([])
 
 async function fetchItems() {
     const fetchedItems = await getItem()
-    const fetchedCatFacts = await getTestingFacts()
-    testingFacts.value = fetchedCatFacts as Facts[]
     const sortItems = ref<Facts[]>([])
     sortItems.value = fetchedItems as Facts[]
     displayItems.value = sortItems.value.sort((a, b) => a.id - b.id);

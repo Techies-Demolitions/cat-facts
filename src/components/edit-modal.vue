@@ -15,7 +15,7 @@
 </template>
 
 <script setup lang="ts">
-import { getCatFacts } from '@/composable/use-item';
+import { getCatFacts } from '@/composable/use-facts';
 import { FactsThings } from '@/enums/enums';
 import { computed, ref, watch, onMounted } from 'vue';
 

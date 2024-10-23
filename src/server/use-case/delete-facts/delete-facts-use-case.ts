@@ -1,8 +1,7 @@
-import { deleteDataFromFacts } from '@/server/services/catFacts.service'
-import type { Facts } from '@/types/facts'
+import { factsService } from '@/server/services/catFacts.service'
 
 export async function deleteFactsUseCase(itemId: number) {
-  const response = await deleteDataFromFacts(itemId)
+  const response = await factsService.deleteDataFromFacts(itemId)
 
   return response
 }

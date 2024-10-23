@@ -1,4 +1,5 @@
 import { piniaInstance } from '@/global'
+import { factsFactory } from '@/server/factories/facts.factory'
 import type { Facts } from '@/types/facts'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
@@ -6,44 +7,9 @@ import { ref } from 'vue'
 export const useItemStore = defineStore('facts', () => {
   const items = ref<Facts[]>([])
 
-  // testing
-  async function fetchdata() {
-    try {
-      const response = await fetch('/api/test/index') // Correct endpoint
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`)
-      }
-      const data = await response.json()
-      console.log(data)
-      return data // Return or store the fetched data as needed
-    } catch (error) {
-      console.error('Failed to fetch:', error)
-      // Handle the error appropriately
-    }
-  }
-
-  // testing
-
-  function findLastIndexID(Items: Facts[]): number {
-    const lastIndex = ref<number>(0)
-    lastIndex.value = Items.length
-    if (lastIndex.value <= 0) return 0
-
-    return items.value[lastIndex.value - 1].id + 1
-  }
-
-  // ID value
-  const id = ref<number>(0)
-  id.value = findLastIndexID(items.value)
-
   // Actions
-  function addItemStore(facts: string, date: number) {
-    const item = {
-      id: id.value++,
-      facts: facts,
-      created_at: date
-    }
-    items.value.push(item as Facts)
+  function addItemStore(facts: Facts) {
+    items.value.push(facts)
   }
 
   function setItemStore(setItems: Facts[]) {
@@ -71,7 +37,7 @@ export const useItemStore = defineStore('facts', () => {
   }
 
   async function getIdCount() {
-    return id.value
+    return factsFactory.findLastIndexId(items.value)
   }
 
   return {
@@ -81,7 +47,6 @@ export const useItemStore = defineStore('facts', () => {
     updateItemStore,
     getItemStore,
     getIdCount,
-    deleteItemStore,
-    fetchdata
+    deleteItemStore
   }
 })(piniaInstance)

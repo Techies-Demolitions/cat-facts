@@ -18,3 +18,18 @@ export function formatDateFactory(data: any) {
 
   return dateOnly
 }
+
+function findLastIndexId(Items: Facts[]): number {
+  // if empty
+  if (Items.length === 0) {
+    return -1
+  }
+
+  const lastItem = Items[Items.length - 1]
+
+  return lastItem.id
+}
+
+export const factsFactory = {
+  findLastIndexId
+}

@@ -2,7 +2,7 @@ import type { Facts } from '@/types/facts'
 import { supabase } from '../db/supabaseServices'
 
 // get
-export const getAllDataFromFacts = async () => {
+const getAllDataFromFacts = async () => {
   const { data, error } = await supabase.from('facts').select('*')
 
   // handle error
@@ -14,15 +14,14 @@ export const getAllDataFromFacts = async () => {
   // Check if data is empty
   if (!data || data.length === 0) {
     console.warn('No data found in the table.')
-  } else {
-    console.log('Fetched data:', JSON.stringify(data, null, 2))
+    return []
   }
 
   return data
 }
 
 // add
-export const insertDataIntoFacts = async (data: Facts) => {
+const insertDataIntoFacts = async (data: Facts) => {
   const { error } = await supabase.from('facts').insert([data])
 
   // handle error
@@ -32,7 +31,7 @@ export const insertDataIntoFacts = async (data: Facts) => {
 }
 
 // update
-export const updateDataFromFacts = async (id: number, facts: Facts) => {
+const updateDataFromFacts = async (id: number, facts: Facts) => {
   const { data, error } = await supabase.from('facts').update(facts).eq('id', id)
 
   // handle error
@@ -46,11 +45,18 @@ export const updateDataFromFacts = async (id: number, facts: Facts) => {
 }
 
 // delete
-export const deleteDataFromFacts = async (id: number) => {
+const deleteDataFromFacts = async (id: number) => {
   const { error } = await supabase.from('facts').delete().eq('id', id)
 
   // handle error
   if (error) {
     throw new Error(`${error.message}`)
   }
+}
+
+export const factsService = {
+  getAllDataFromFacts,
+  insertDataIntoFacts,
+  updateDataFromFacts,
+  deleteDataFromFacts
 }

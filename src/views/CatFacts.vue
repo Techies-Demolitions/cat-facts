@@ -69,15 +69,13 @@ import addModal from '@/components/add-modal.vue'
 import editModal from '@/components/edit-modal.vue'
 import itemCount from '@/components/item-count.vue'
 import ItemTable from '@/components/item-table.vue'
-import { useItem, useFacts } from '@/composable/use-item'
-import { useItemStore } from '@/stores/items'
+import { useItem, useFacts } from '@/composable/use-facts'
 import type { Facts } from '@/types/facts'
 import { watch } from 'vue'
 import { computed, onMounted, ref } from 'vue'
 
 const { addItem, getItem, popItem, updateItem } = useItem()
 const { addFacts } = useFacts()
-const storeItem = useItemStore
 
 onMounted(() => {
   fetchItemData()
@@ -100,7 +98,6 @@ const isTableEmpty = ref();
 
 // functions
 async function fetchItemData() {
-  storeItem.fetchdata();
   const itemsLoaded = await getItem()
   item.value = itemsLoaded as Facts[]
 }
