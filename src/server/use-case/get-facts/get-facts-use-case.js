@@ -1,4 +1,4 @@
-import { factsService } from '@/server/services/catFacts.service'
+import { factsService } from '../../services/catFacts.service.js'
 
 export async function getFactsUseCase() {
   const response = await factsService.getAllDataFromFacts()

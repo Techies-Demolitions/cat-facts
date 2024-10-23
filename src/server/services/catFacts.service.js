@@ -1,5 +1,4 @@
-import type { Facts } from '@/types/facts'
-import { supabase } from '../db/supabaseServices'
+import { supabase } from '../db/supabaseServices.js'
 
 // get
 const getAllDataFromFacts = async () => {
@@ -21,7 +20,7 @@ const getAllDataFromFacts = async () => {
 }
 
 // add
-const insertDataIntoFacts = async (data: Facts) => {
+const insertDataIntoFacts = async (data) => {
   const { error } = await supabase.from('facts').insert([data])
 
   // handle error
@@ -31,7 +30,7 @@ const insertDataIntoFacts = async (data: Facts) => {
 }
 
 // update
-const updateDataFromFacts = async (id: number, facts: Facts) => {
+const updateDataFromFacts = async (id, facts) => {
   const { data, error } = await supabase.from('facts').update(facts).eq('id', id)
 
   // handle error
@@ -45,7 +44,7 @@ const updateDataFromFacts = async (id: number, facts: Facts) => {
 }
 
 // delete
-const deleteDataFromFacts = async (id: number) => {
+const deleteDataFromFacts = async (id) => {
   const { error } = await supabase.from('facts').delete().eq('id', id)
 
   // handle error

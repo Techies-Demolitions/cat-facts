@@ -1,32 +1,60 @@
-import { getCatFactsData } from '@/server/api/get-facts/index.get'
+import { getCatFactsData } from '@/server/api/generate-facts/index.get'
 import { catFactsFactory, formatDateFactory } from '@/server/factories/facts.factory'
-
-// useAPI
-export async function getCatFacts() {
-  const facts = await getCatFactsData()
-
-  if (typeof facts === 'string') return facts // checks if response not ok
-
-  const modifiedDate = formatDateFactory(facts)
-
-  const responseFactory = await catFactsFactory(facts, modifiedDate).catch((error) => {
-    throw new Error(error)
-  })
-
-  return responseFactory
-}
+import type { Facts } from '@/types/facts'
 
 // useFacts
 export function useFacts() {
-  async function getFacts() {}
+  async function getFacts() {
+    const data = await fetch('/api/get-facts')
 
-  async function addFacts(facts: string, date: number) {}
+    if (!data.ok) throw new Error('found while fetching get API. Please try again...')
+
+    const response = await data.json()
+    console.log('Response: ' + JSON.stringify(response))
+
+    return response as Facts[]
+  }
+
+  async function generateFacts() {
+    const facts = await getCatFactsData() //api/generate-facts
+
+    if (typeof facts === 'string') return facts // checks if response not ok
+
+    const modifiedDate = formatDateFactory(facts)
+
+    const responseFactory = await catFactsFactory(facts, modifiedDate).catch((error) => {
+      throw new Error(error)
+    })
+
+    return responseFactory
+  }
+
+  function addFacts(facts: string, date: number) {}
 
   function popFacts() {}
 
   async function updateFacts(previousFactsId: number, updatedFacts: string, updatedDate: number) {}
 
-  function deleteFacts(id: number) {}
+  async function deleteFacts(id: number) {
+    try {
+      const response = await fetch('/api/delete-facts', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ id })
+      })
 
-  return { getFacts, addFacts, updateFacts, popFacts, deleteFacts }
+      if (!response.ok) {
+        const errorData = await response.json()
+        const errorMessage = errorData.message || 'Error deleting the fact. Please try again later.'
+        throw new Error(errorMessage)
+      }
+    } catch (error) {
+      console.error('Error in deleteFacts:', error)
+      throw error
+    }
+  }
+
+  return { getFacts, addFacts, updateFacts, popFacts, deleteFacts, generateFacts }
 }
