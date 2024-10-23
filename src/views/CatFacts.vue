@@ -69,12 +69,12 @@ import addModal from '@/components/add-modal.vue'
 import editModal from '@/components/edit-modal.vue'
 import itemCount from '@/components/item-count.vue'
 import ItemTable from '@/components/item-table.vue'
-import { useItem, useFacts } from '@/composable/use-facts'
+import { useFacts } from '@/composable/use-facts'
 import type { Facts } from '@/types/facts'
 import { watch } from 'vue'
 import { computed, onMounted, ref } from 'vue'
 
-const { addItem, getItem, popItem, updateItem } = useItem()
+// const { addItem, getItem, popItem, updateItem } = useItem()
 const { addFacts } = useFacts()
 
 onMounted(() => {
@@ -98,15 +98,15 @@ const isTableEmpty = ref();
 
 // functions
 async function fetchItemData() {
-  const itemsLoaded = await getItem()
-  item.value = itemsLoaded as Facts[]
+  // const itemsLoaded = await getItem()
+  // item.value = itemsLoaded as Facts[]
 }
 
 function reloadItems(selector: string): void {
-  if (selector === 'pop') popItem()
-  else if (selector === 'add') fetchItemData()
-  else if (selector === 'update') handleCancel()
-  else return
+  // if (selector === 'pop') popItem()
+  // else if (selector === 'add') fetchItemData()
+  // else if (selector === 'update') handleCancel()
+  // else return
 }
 
 function generateNewFacts(): void {
@@ -139,7 +139,7 @@ function closeModal() {
 }
 
 function handleItemAdded(itemFact: string, itemDate: number): void {
-  addItem(itemFact, itemDate)
+  // addItem(itemFact, itemDate)
   addFacts(itemFact, itemDate)
   reloadItems('add')
 }
@@ -149,7 +149,7 @@ function handleItemUpdated(
   itemFactUpdate: string,
   itemDateUpdate: number
 ): void {
-  updateItem(previousItemId, itemFactUpdate, itemDateUpdate)
+  // updateItem(previousItemId, itemFactUpdate, itemDateUpdate)
   reloadItems('update')
 }
 

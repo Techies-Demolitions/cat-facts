@@ -37,15 +37,15 @@
 </template>
 
 <script setup lang="ts">
-import { useItem, useFacts } from '@/composable/use-facts';
+import { useFacts } from '@/composable/use-facts';
 import type { Facts } from '@/types/facts';
 import { computed, onMounted, ref, watch } from 'vue';
 
-const { getItem, deleteItem } = useItem()
-const { deleteFacts } = useFacts()
+const { getFacts, deleteFacts } = useFacts()
 
 onMounted(async () => {
     await fetchItems()
+    getFacts()
 })
 
 const props = defineProps({
@@ -67,10 +67,10 @@ const testingFacts = ref<Facts[]>([])
 
 
 async function fetchItems() {
-    const fetchedItems = await getItem()
-    const sortItems = ref<Facts[]>([])
-    sortItems.value = fetchedItems as Facts[]
-    displayItems.value = sortItems.value.sort((a, b) => a.id - b.id);
+    // const fetchedItems = await getItem()
+    // const sortItems = ref<Facts[]>([])
+    // sortItems.value = fetchedItems as Facts[]
+    // displayItems.value = sortItems.value.sort((a, b) => a.id - b.id);
 }
 
 function refetchItems(): void {
@@ -103,7 +103,7 @@ function handleSelectFact(itemSelected: Facts): void {
 }
 
 function handleDelete(itemSelectedDelete: Facts): void {
-    deleteItem(itemSelectedDelete);
+    // deleteItem(itemSelectedDelete);
 }
 
 function handleUpdate(itemSelectedId: number): void {
