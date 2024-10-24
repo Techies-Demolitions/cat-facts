@@ -45,6 +45,7 @@ const { getFacts, deleteFacts } = useFacts()
 
 onMounted(async () => {
     await fetchItems()
+    deleteFacts(1)
     getFacts()
 })
 

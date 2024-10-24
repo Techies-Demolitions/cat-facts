@@ -5,14 +5,22 @@ import type { Facts } from '@/types/facts'
 // useFacts
 export function useFacts() {
   async function getFacts() {
-    const data = await fetch('/api/get-facts')
+    try {
+      const data = await fetch('/api/get-facts')
 
-    if (!data.ok) throw new Error('found while fetching get API. Please try again...')
+      //handles api error response
+      if (!data.ok) {
+        const errorResponse = await data.json()
+        throw new Error(errorResponse.error || 'An error occurred while fetching facts')
+      }
 
-    const response = await data.json()
-    console.log('Response: ' + JSON.stringify(response))
+      const response = await data.json()
 
-    return response as Facts[]
+      return response as Facts[]
+    } catch (error) {
+      if (error instanceof Error) throw error
+      else throw new Error('Unknown error occurred') //handles unknown error
+    }
   }
 
   async function generateFacts() {
@@ -46,13 +54,12 @@ export function useFacts() {
       })
 
       if (!response.ok) {
-        const errorData = await response.json()
-        const errorMessage = errorData.message || 'Error deleting the fact. Please try again later.'
-        throw new Error(errorMessage)
+        const errorResponse = await response.json()
+        throw new Error(errorResponse.error || 'An error occurred while fetching facts')
       }
     } catch (error) {
-      console.error('Error in deleteFacts:', error)
-      throw error
+      if (error instanceof Error) throw error
+      else throw new Error('Unknown error occurred') //handles unknown error
     }
   }
 

@@ -6,11 +6,14 @@ const router = express.Router()
 
 router.delete('/delete-facts', async (req, res) => {
   try {
-    const { id } = req.body // Assume you're sending the ID in the body
+    const { id } = req.body
     await deleteFactsUseCase(id)
-    res.status(204).send() // No content
+    res.status(204).send() // No Content
   } catch (error) {
-    res.status(500).json({ error: 'Error deleting fact' })
+    if (error.message.includes('No internet connection')) {
+      return res.status(503).json({ error: 'Service unavailable. No internet connection.' })
+    }
+    res.status(500).json({ error: 'Deleting fact failed' })
   }
 })
 

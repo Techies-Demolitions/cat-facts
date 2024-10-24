@@ -2,54 +2,72 @@ import { supabase } from '../db/supabaseServices.js'
 
 // get
 const getAllDataFromFacts = async () => {
-  const { data, error } = await supabase.from('facts').select('*')
+  try {
+    const { data, error } = await supabase.from('facts').select('*')
 
-  // handle error
-  if (error) {
-    console.error(error.message)
-    return
-  }
+    // handle error
+    if (error) {
+      console.error(error.message)
+      return
+    }
 
-  // Check if data is empty
-  if (!data || data.length === 0) {
-    console.warn('No data found in the table.')
+    // Check if data is empty
+    if (!data || data.length === 0) {
+      console.warn('No data found in the table.')
+      return []
+    }
+
+    return data
+  } catch (err) {
+    console.error(`Error fetching data: ${err.message}`)
     return []
   }
-
-  return data
 }
 
 // add
 const insertDataIntoFacts = async (data) => {
-  const { error } = await supabase.from('facts').insert([data])
+  try {
+    const { error } = await supabase.from('facts').insert([data])
 
-  // handle error
-  if (error) {
-    throw new Error(`Error inserting data: ${error.message}`)
+    // handle error
+    if (error) {
+      throw new Error(`Error inserting data: ${error.message}`)
+    }
+  } catch (err) {
+    console.error(err.message)
+    throw new Error(`Failed to insert data: ${err.message}`)
   }
 }
 
 // update
 const updateDataFromFacts = async (id, facts) => {
-  const { data, error } = await supabase.from('facts').update(facts).eq('id', id)
+  try {
+    const { data, error } = await supabase.from('facts').update(facts).eq('id', id)
 
-  // handle error
-  if (error) {
-    throw new Error(`${error.message}`)
+    // handle error
+    if (error) {
+      throw new Error(`${error.message}`)
+    }
+
+    return data
+  } catch (err) {
+    console.error(err.message)
+    throw new Error(`Failed to update data: ${err.message}`)
   }
-
-  const response = data
-
-  return response
 }
 
 // delete
 const deleteDataFromFacts = async (id) => {
-  const { error } = await supabase.from('facts').delete().eq('id', id)
+  try {
+    const { error } = await supabase.from('facts').delete().eq('id', id)
 
-  // handle error
-  if (error) {
-    throw new Error(`${error.message}`)
+    // handle error
+    if (error) {
+      throw new Error(`${error.message}`)
+    }
+  } catch (err) {
+    console.error(err.message)
+    throw new Error(`Failed to delete data: ${err.message}`)
   }
 }
 
