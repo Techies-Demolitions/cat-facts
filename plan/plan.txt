@@ -1,6 +1,6 @@
 Cat-Facts Storage System Plan
 
 1. Begin
-2. Generate Facts and store inside the localstorage
-3. Print generated facts from localstorage
+2. Generate Facts and store inside the database
+3. Print generated facts from database
 4. End
