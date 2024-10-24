@@ -15,9 +15,14 @@
 </template>
 
 <script setup lang="ts">
-import { getCatFacts } from '@/composable/use-item';
+import { useFacts } from '@/composable/use-facts';
+import { useFactsFactory } from '@/composable/use-facts-factory';
+import { useItem } from '@/composable/use-item-store';
 import { FactsThings } from '@/enums/enums';
 import { computed, ref, watch, onMounted } from 'vue';
+const { getCatFactsStore } = useItem()
+const { generateFacts } = useFacts()
+const { isFetchedFactForCats } = useFactsFactory()
 
 onMounted(async () => {
     window.addEventListener('click', handleClickOutside);
@@ -40,7 +45,7 @@ const modal = ref<HTMLElement | null>(null);
 
 // functions
 async function fetchCatData() {
-    const fetchedCatFactsData = await getCatFacts();
+    const fetchedCatFactsData = await generateFacts();
 
     if (typeof (fetchedCatFactsData) !== "object") { // responds bad request
         catFactsText.value = FactsThings.ErrorMessage;
@@ -63,11 +68,6 @@ function handleIsFactForCats(fetchedFact: string) {
     catFactsText.value = isFetchedFactForCats(fetchedFact) ? fetchedFact : FactsThings.Generating;
     if (catFactsText.value === fetchedFact) return
     refetchCatData();
-}
-
-function isFetchedFactForCats(input: string): boolean {
-    if (input.search(/cat/i) > 0) { return true; }
-    else { return false; }
 }
 
 const getStyle = computed(() => ({
@@ -114,6 +114,7 @@ watch(
     { immediate: true }
 );
 
+// triggers generate new fact
 watch(
     () => props.generateNewFact,
     (newValue) => {

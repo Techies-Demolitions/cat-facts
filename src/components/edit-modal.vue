@@ -15,7 +15,7 @@
 </template>
 
 <script setup lang="ts">
-import { getCatFacts } from '@/composable/use-item';
+// import { getCatFacts } from '@/composable/use-facts'
 import { FactsThings } from '@/enums/enums';
 import { computed, ref, watch, onMounted } from 'vue';
 
@@ -43,14 +43,14 @@ const modal = ref<HTMLElement | null>(null);
 
 // functions
 async function fetchCatData() {
-    const fetchedCatFactsData = await getCatFacts();
+    // const fetchedCatFactsData = await getCatFacts();
 
-    if (typeof (fetchedCatFactsData) === "string") { // responds bad request
-        currentFactsText.value = FactsThings.ErrorMessage
-        return
-    }
-    handleIsFactForCats(fetchedCatFactsData.value.facts);
-    insertDate(fetchedCatFactsData.value.created_at);
+    // if (typeof (fetchedCatFactsData) === "string") { // responds bad request
+    //     currentFactsText.value = FactsThings.ErrorMessage
+    //     return
+    // }
+    // handleIsFactForCats(fetchedCatFactsData.value.facts);
+    // insertDate(fetchedCatFactsData.value.created_at);
 }
 
 async function refetchCatData() {
