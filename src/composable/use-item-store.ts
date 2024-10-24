@@ -5,10 +5,10 @@ const itemStore = useItemStore
 
 // useItemStore
 export function useItem() {
-  async function getItem() {
+  async function getCatFactsStore() {
     const response = await itemStore.getItemStore()
 
-    return response
+    return response as Facts[]
   }
 
   async function setItem(items: Facts[]) {
@@ -31,5 +31,5 @@ export function useItem() {
     itemStore.deleteItemStore(item)
   }
 
-  return { getItem, setItem, addItem, popItem, updateItem, deleteItem }
+  return { getCatFactsStore, setItem, addItem, popItem, updateItem, deleteItem }
 }

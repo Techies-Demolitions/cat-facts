@@ -1,6 +1,7 @@
 import { getCatFactsData } from '@/server/api/generate-facts/index.get'
-import { catFactsFactory, formatDateFactory } from '@/server/factories/facts.factory'
 import type { Facts } from '@/types/facts'
+import { useFactsFactory } from './use-facts-factory'
+const { buildCatFact, formatDateFactory, isFetchedFactForCats } = useFactsFactory()
 
 // useFacts
 export function useFacts() {
@@ -30,7 +31,7 @@ export function useFacts() {
 
     const modifiedDate = formatDateFactory(facts)
 
-    const responseFactory = await catFactsFactory(facts, modifiedDate).catch((error) => {
+    const responseFactory = await buildCatFact(facts, modifiedDate).catch((error) => {
       throw new Error(error)
     })
 

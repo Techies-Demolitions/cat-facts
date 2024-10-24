@@ -1,8 +1,9 @@
+import { useFactsFactory } from '@/composable/use-facts-factory'
 import { piniaInstance } from '@/global'
-import { factsFactory } from '@/server/factories/facts.factory'
 import type { Facts } from '@/types/facts'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+const { findLastIndexId } = useFactsFactory()
 
 export const useItemStore = defineStore('facts', () => {
   const items = ref<Facts[]>([])
@@ -37,7 +38,7 @@ export const useItemStore = defineStore('facts', () => {
   }
 
   async function getIdCount() {
-    return factsFactory.findLastIndexId(items.value)
+    return findLastIndexId(items.value)
   }
 
   return {
