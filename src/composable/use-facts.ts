@@ -16,7 +16,7 @@ export function useFacts() {
       }
 
       const response = await data.json()
-
+      console.log('Response: ' + JSON.stringify(response))
       return response as Facts[]
     } catch (error) {
       if (error instanceof Error) throw error
