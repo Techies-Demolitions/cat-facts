@@ -21,7 +21,7 @@
           <div id="content">
             <itemCount :itemCountAtCurrent="currentItemCount()" />
             <button class="nes-btn" @click="toggleShowTextMethod()" id="showAllButton">
-              {{ showText }}
+              {{ isHideOrShowAll }}
             </button>
             <ItemTable :isDelete="isDelete" :isEdit="isEdit" :toggleShowText="toggleShowText"
               @showEditModal="showEditModal" @currentCatFactsText="handleCurrentCatFactsText" />
@@ -70,20 +70,21 @@ import editModal from '@/components/edit-modal.vue'
 import itemCount from '@/components/item-count.vue'
 import ItemTable from '@/components/item-table.vue'
 import { useFacts } from '@/composable/use-facts'
-import type { Facts } from '@/types/facts'
+import type { ClientSideFact } from '@/types/facts'
 import { watch } from 'vue'
 import { computed, onMounted, ref } from 'vue'
 
 // const { addItem, getItem, popItem, updateItem } = useItem()
-const { addFacts } = useFacts()
+const { addFacts, getFacts } = useFacts()
 
 onMounted(() => {
   fetchItemData()
   generateNewFacts()
+  getFacts()
 })
 
 // declarations
-const item = ref<Facts[]>([])
+const item = ref<ClientSideFact[]>([])
 const shouldShowAddModal = ref<boolean>()
 const shouldShowEditModal = ref<boolean>()
 const itemSelectedFactText = ref<string>()
@@ -92,7 +93,7 @@ const isDelete = ref<boolean>()
 const shouldShowDelete = ref<boolean>(true)
 const shouldShowUpdate = ref<boolean>(true)
 const isEdit = ref<boolean>(false)
-const showText = ref<string>('Hide All')
+const isHideOrShowAll = ref<string>('Hide All')
 const toggleShowText = ref<boolean>(false)
 const isTableEmpty = ref();
 
@@ -139,7 +140,6 @@ function closeModal() {
 }
 
 function handleItemAdded(itemFact: string, itemDate: number): void {
-  // addItem(itemFact, itemDate)
   addFacts(itemFact, itemDate)
   reloadItems('add')
 }
@@ -190,7 +190,7 @@ function handleCurrentCatFactsText(selectedFactText: string): void {
 }
 
 function toggleShowTextMethod(): void {
-  showText.value = toggleShowText.value ? 'Hide All' : 'Show All'
+  isHideOrShowAll.value = toggleShowText.value ? 'Hide All' : 'Show All'
   toggleShowText.value = !toggleShowText.value
 }
 

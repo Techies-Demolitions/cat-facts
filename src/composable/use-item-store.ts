@@ -1,21 +1,21 @@
 import { useItemStore } from '@/stores/items'
-import type { Facts } from '@/types/facts'
+import type { ClientSideFact } from '@/types/facts'
 
 const itemStore = useItemStore
 
 // useItemStore
-export function useItem() {
+export function useFactsStore() {
   async function getCatFactsStore() {
     const response = await itemStore.getItemStore()
 
-    return response as Facts[]
+    return response
   }
 
-  async function setItem(items: Facts[]) {
+  async function setCatFactsStore(items: ClientSideFact[]) {
     itemStore.setItemStore(items)
   }
 
-  async function addItem(facts: Facts) {
+  async function addItem(facts: ClientSideFact) {
     itemStore.addItemStore(facts)
   }
 
@@ -27,9 +27,9 @@ export function useItem() {
     itemStore.updateItemStore(previousFactsId, updatedFacts, updatedDate)
   }
 
-  function deleteItem(item: Facts) {
+  function deleteItem(item: ClientSideFact) {
     itemStore.deleteItemStore(item)
   }
 
-  return { getCatFactsStore, setItem, addItem, popItem, updateItem, deleteItem }
+  return { getCatFactsStore, setCatFactsStore, addItem, popItem, updateItem, deleteItem }
 }

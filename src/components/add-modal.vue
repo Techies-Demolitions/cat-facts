@@ -6,8 +6,9 @@
             <p id="showFacts">
                 {{ showFacts() }}
             </p><br>
-            <div style="display:inline" v-if="shouldShowTools">
-                <button @click="keepFacts()" style="margin-right:var(--section-gap)">Keep</button>
+            <div style="display:inline">
+                <button v-if="shouldShowTools" @click="keepFacts()"
+                    style="margin-right:var(--section-gap)">Keep</button>
                 <button @click="generateNewFacts()">Generate New Facts</button>
             </div>
         </div>
@@ -17,10 +18,10 @@
 <script setup lang="ts">
 import { useFacts } from '@/composable/use-facts';
 import { useFactsFactory } from '@/composable/use-facts-factory';
-import { useItem } from '@/composable/use-item-store';
+import { useFactsStore } from '@/composable/use-item-store';
 import { FactsThings } from '@/enums/enums';
 import { computed, ref, watch, onMounted } from 'vue';
-const { getCatFactsStore } = useItem()
+const { getCatFactsStore } = useFactsStore()
 const { generateFacts } = useFacts()
 const { isFetchedFactForCats } = useFactsFactory()
 
@@ -38,36 +39,26 @@ const emit = defineEmits(["closeModal", "itemAdded", "factsForCats"]);
 // declarations
 const isActive = ref<boolean>(false);
 const catFactsText = ref<string>('');
-const catFactsDate = ref<number>();
+const catFactsDate = ref<string | number>();
 const generateNewFactsIsTrigger = ref<boolean>();
 const shouldShowTools = ref<boolean>(true);
 const modal = ref<HTMLElement | null>(null);
 
 // functions
 async function fetchCatData() {
-    const fetchedCatFactsData = await generateFacts();
-
-    if (typeof (fetchedCatFactsData) !== "object") { // responds bad request
+    try {
+        const fetchedCatFactsData = await generateFacts();
+        catFactsText.value = fetchedCatFactsData.facts;
+        catFactsDate.value = fetchedCatFactsData.created_at;
+    } catch (error) {
+        console.error('Error fetching cat data:', error);
         catFactsText.value = FactsThings.ErrorMessage;
-        return
     }
-
-    handleIsFactForCats(fetchedCatFactsData.value.facts);
-    insertDate(fetchedCatFactsData.value.created_at);
 }
 
-async function refetchCatData() {
+
+function refetchCatData() {
     fetchCatData();
-}
-
-function insertDate(fetchedDateCreated: number) {
-    catFactsDate.value = fetchedDateCreated;
-}
-
-function handleIsFactForCats(fetchedFact: string) {
-    catFactsText.value = isFetchedFactForCats(fetchedFact) ? fetchedFact : FactsThings.Generating;
-    if (catFactsText.value === fetchedFact) return
-    refetchCatData();
 }
 
 const getStyle = computed(() => ({
@@ -94,7 +85,7 @@ function keepFacts() {
 }
 
 async function generateNewFacts() {
-    fetchCatData();
+    refetchCatData();
 }
 
 function closeModal() {

@@ -1,11 +1,22 @@
 // FACTORY -> COMPOSABLES
-
 import { factsFactory } from '@/factories/facts.factory'
-import type { Facts } from '@/types/facts'
+import type { ClientSideFact, ServerSideFact } from '@/types/facts'
 
 export function useFactsFactory() {
-  async function buildCatFact(data: any, modifiedDate: any) {
-    const response = await factsFactory.buildCatFact(data, modifiedDate)
+  async function buildCatFact(id: any, date: any, facts: any, isServerSide: boolean) {
+    const response = await factsFactory.buildServerOrClientCatFact(id, date, facts, isServerSide)
+
+    return response
+  }
+
+  async function transformServerSideFactIntoClientSideFact(
+    data: ServerSideFact,
+    modifiedDate: string
+  ) {
+    const response = await factsFactory.transformServerSideFactIntoClientSideFact(
+      data,
+      modifiedDate
+    )
 
     return response
   }
@@ -23,7 +34,7 @@ export function useFactsFactory() {
     return response
   }
 
-  function findLastIndexId(Items: Facts[]): number {
+  function findLastIndexId(Items: ClientSideFact[]): number {
     // if empty
     if (Items.length === 0) {
       return -1
@@ -34,5 +45,11 @@ export function useFactsFactory() {
     return lastItem.id
   }
 
-  return { buildCatFact, formatDateFactory, isFetchedFactForCats, findLastIndexId }
+  return {
+    buildCatFact,
+    formatDateFactory,
+    isFetchedFactForCats,
+    findLastIndexId,
+    transformServerSideFactIntoClientSideFact
+  }
 }

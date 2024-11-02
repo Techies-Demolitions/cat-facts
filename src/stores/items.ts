@@ -1,23 +1,23 @@
 import { useFactsFactory } from '@/composable/use-facts-factory'
 import { piniaInstance } from '@/global'
-import type { Facts } from '@/types/facts'
+import type { ClientSideFact } from '@/types/facts'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 const { findLastIndexId } = useFactsFactory()
 
 export const useItemStore = defineStore('facts', () => {
-  const items = ref<Facts[]>([])
+  const items = ref<ClientSideFact[]>([])
 
   // Actions
-  function addItemStore(facts: Facts) {
+  function addItemStore(facts: ClientSideFact) {
     items.value.push(facts)
   }
 
-  function setItemStore(setItems: Facts[]) {
+  function setItemStore(setItems: ClientSideFact[]) {
     items.value = setItems
   }
 
-  function deleteItemStore(item: Facts) {
+  function deleteItemStore(item: ClientSideFact) {
     items.value = items.value.filter((items) => items.id !== item.id)
   }
 

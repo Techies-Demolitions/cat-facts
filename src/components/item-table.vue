@@ -19,11 +19,6 @@
                         <td class="modifiedItems">{{ facts.created_at }}</td>
                         <td>{{ facts.facts }}</td>
                     </tr>
-                    <tr v-for="facts in testingFacts " :key="facts.id" :class="tableRowStyle">
-                        <td class="modifiedItems">{{ facts.id }}</td>
-                        <td class="modifiedItems">{{ facts.created_at }}</td>
-                        <td>{{ facts.facts }}</td>
-                    </tr>
                 </tbody>
             </table>
             <div v-else style="color:var(--color-text)">
@@ -38,15 +33,15 @@
 
 <script setup lang="ts">
 import { useFacts } from '@/composable/use-facts';
-import type { Facts } from '@/types/facts';
+import { useFactsStore } from '@/composable/use-item-store';
+import type { ClientSideFact } from '@/types/facts';
 import { computed, onMounted, ref, watch } from 'vue';
 
 const { getFacts, deleteFacts } = useFacts()
+const { getCatFactsStore } = useFactsStore()
 
 onMounted(async () => {
-    await fetchItems()
-    deleteFacts(1)
-    getFacts()
+    await fetchCatFacts()
 })
 
 const props = defineProps({
@@ -58,28 +53,25 @@ const props = defineProps({
 const emit = defineEmits(["showEditModal", "currentCatFactsText"])
 
 // declarations
-const displayItems = ref<Facts[]>([])
+const displayItems = ref<ClientSideFact[]>([])
 const shouldShowText = ref<boolean>(false)
 const isDeleteValue = ref<boolean>(false)
 const isEditValue = ref<boolean>(false)
-const testingFacts = ref<Facts[]>([])
 
 // functions
-
-
-async function fetchItems() {
-    // const fetchedItems = await getItem()
-    // const sortItems = ref<Facts[]>([])
-    // sortItems.value = fetchedItems as Facts[]
-    // displayItems.value = sortItems.value.sort((a, b) => a.id - b.id);
+async function fetchCatFacts(): Promise<void> {
+    const fetchedItems = await getFacts()
+    const sortItems = fetchedItems as ClientSideFact[]
+    displayItems.value = sortItems.sort((a, b) => a.id - b.id);
+    console.log(fetchedItems[0].facts)
 }
 
-function refetchItems(): void {
-    fetchItems();
+function refetchCatFacts(): void {
+    fetchCatFacts();
 }
 
 function reloadItems(): void {
-    refetchItems();
+    refetchCatFacts();
 }
 
 
@@ -97,13 +89,13 @@ const tableRowStyle = computed(() => ({
     "nes-pointer": isToolClicked()
 }))
 
-function handleSelectFact(itemSelected: Facts): void {
+function handleSelectFact(itemSelected: ClientSideFact): void {
     if (isDeleteValue.value) handleDelete(itemSelected);
     if (isEditValue.value) handleUpdate(itemSelected.id);
     reloadItems();
 }
 
-function handleDelete(itemSelectedDelete: Facts): void {
+function handleDelete(itemSelectedDelete: ClientSideFact): void {
     // deleteItem(itemSelectedDelete);
 }
 

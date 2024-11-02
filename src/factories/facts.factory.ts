@@ -1,14 +1,45 @@
-import type { Facts } from '@/types/facts'
+import type { ClientSideFact, ServerSideFact } from '@/types/facts'
 import { ref } from 'vue'
 
-async function buildCatFact(data: any, modifiedDate: any) {
-  const catFacts = ref<Facts>({
-    id: data._id,
-    facts: data.text,
-    created_at: modifiedDate
+// builds server-side || client-side in one factory
+async function buildServerOrClientCatFact(
+  id: number,
+  date: Date,
+  facts: string,
+  isServerSide: boolean
+) {
+  if (isServerSide) {
+    const textId = id.toString(id)
+    const serverCatFact: ServerSideFact = {
+      _id: textId,
+      text: facts,
+      updatedAt: JSON.stringify(date)
+    }
+
+    return serverCatFact
+  } else {
+    // if clientSide
+    const clientCatFact: ClientSideFact = {
+      id: id,
+      created_at: JSON.stringify(date),
+      facts: facts
+    }
+
+    return clientCatFact
+  }
+}
+
+async function transformServerSideFactIntoClientSideFact(
+  data: ServerSideFact,
+  modifiedDate: string
+) {
+  const catFacts = ref<ClientSideFact>({
+    id: parseInt(data._id),
+    created_at: modifiedDate,
+    facts: data.text
   })
 
-  return catFacts
+  return catFacts.value
 }
 
 function formatDateFactory(data: any) {
@@ -20,12 +51,12 @@ function formatDateFactory(data: any) {
 }
 
 function isFetchedFactForCats(input: string): boolean {
-  if (input.search(/cat/i) > 0) return true
-  else return false
+  return typeof input === 'string' && input.search(/cat/i) >= 0
 }
 
 export const factsFactory = {
-  buildCatFact,
+  buildServerOrClientCatFact,
+  transformServerSideFactIntoClientSideFact,
   formatDateFactory,
   isFetchedFactForCats
 }

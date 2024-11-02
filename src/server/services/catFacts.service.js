@@ -24,7 +24,7 @@ const getAllDataFromFacts = async () => {
   }
 }
 
-// add
+// add || post data
 const insertDataIntoFacts = async (data) => {
   try {
     const { error } = await supabase.from('facts').insert([data])
@@ -39,7 +39,7 @@ const insertDataIntoFacts = async (data) => {
   }
 }
 
-// update
+// update || put data
 const updateDataFromFacts = async (id, facts) => {
   try {
     const { data, error } = await supabase.from('facts').update(facts).eq('id', id)

@@ -1,7 +1,14 @@
 import { getCatFactsData } from '@/server/api/generate-facts/index.get'
-import type { Facts } from '@/types/facts'
+import type { ClientSideFact, ServerSideFact as ServerSideFact } from '@/types/facts'
 import { useFactsFactory } from './use-facts-factory'
-const { buildCatFact, formatDateFactory, isFetchedFactForCats } = useFactsFactory()
+import { useFactsStore } from './use-item-store'
+const {
+  buildCatFact,
+  formatDateFactory,
+  isFetchedFactForCats,
+  transformServerSideFactIntoClientSideFact
+} = useFactsFactory()
+const { setCatFactsStore } = useFactsStore()
 
 // useFacts
 export function useFacts() {
@@ -15,30 +22,63 @@ export function useFacts() {
         throw new Error(errorResponse.error || 'An error occurred while fetching facts')
       }
 
-      const response = await data.json()
-      console.log('Response: ' + JSON.stringify(response))
-      return response as Facts[]
+      const jsonData = await data.json()
+      const response = jsonData as ClientSideFact[]
+
+      // loads catFactsStore
+      setCatFactsStore(response)
+
+      return response
     } catch (error) {
       if (error instanceof Error) throw error
       else throw new Error('Unknown error occurred') //handles unknown error
     }
   }
 
-  async function generateFacts() {
-    const facts = await getCatFactsData() //api/generate-facts
+  async function generateFacts(retries = 5) {
+    if (retries <= 0) throw new Error('Too many requests! Fetching stopped.. Server may overload')
 
-    if (typeof facts === 'string') return facts // checks if response not ok
+    try {
+      const data = await getCatFactsData()
+      const fetchedFact = data as ServerSideFact
+      const stringifiedFact = JSON.stringify(fetchedFact.text)
+      const isFactForCat = isFetchedFactForCats(stringifiedFact)
 
-    const modifiedDate = formatDateFactory(facts)
+      if (isFactForCat) {
+        const modifiedDate = formatDateFactory(fetchedFact)
+        const responseFactory = await transformServerSideFactIntoClientSideFact(
+          fetchedFact,
+          modifiedDate
+        )
+        return responseFactory
+      }
 
-    const responseFactory = await buildCatFact(facts, modifiedDate).catch((error) => {
-      throw new Error(error)
-    })
-
-    return responseFactory
+      return await generateFacts(retries - 1) // Retry if the fact is not related to cats
+    } catch (error) {
+      console.error('Error generating cat facts:', error)
+      throw error
+    }
   }
 
-  function addFacts(facts: string, date: number) {}
+  async function addFacts(fact: string, date: number) {
+    const builtCatFact = await buildCatFact(0, date, fact, true)
+    console.log('Hey dude: ' + JSON.stringify(builtCatFact))
+    try {
+      const response = await fetch('/api/post-facts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(builtCatFact)
+      })
+
+      if (!response.ok) {
+        throw new Error(`Failed to post fact: ${response.statusText}`)
+      }
+    } catch (error) {
+      console.error('Error posting fact:', error)
+    }
+  }
 
   function popFacts() {}
 
