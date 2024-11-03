@@ -24,6 +24,8 @@ const { getCatFactsStore } = useItem()
 const { generateFacts } = useFacts()
 const { isFetchedFactForCats } = useFactsFactory()
 
+// this is just a test
+
 onMounted(async () => {
     window.addEventListener('click', handleClickOutside);
 });
